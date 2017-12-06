@@ -19,14 +19,14 @@
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
     [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]              
     ;; Library for Elastic search http://clojureelasticsearch.info/
-    [clojurewerkz/elastisch "2.2.1"]
+    ;; NB: cheshire is provided by oc.lib
+    [clojurewerkz/elastisch "2.2.1" :exclusions [cheshire]]
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.8" :exclusions [commons-logging commons-codec com.fasterxml.jackson.core/jackson-databind]]
+    [open-company/lib "0.14.8"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
     ;; Timbre - Pure Clojure/Script logging library https://github.com/ptaoussanis/timbre
-    
     ;; Amazonica - A comprehensive Clojure client for the AWS API https://github.com/mcohen01/amazonica
     ;; Raven - Interface to Sentry error reporting https://github.com/sethtrain/raven-clj
     ;; Cheshire - JSON encoding / decoding https://github.com/dakrone/cheshire
@@ -36,8 +36,6 @@
 
   :target-path "target/%s"
   
-  :repositories [["jfreechart" "http://central.maven.org/maven2/"]]
-
   ;; All profile plugins
   :plugins [
     [lein-environ "1.1.0"] ; Get environment settings from different sources https://github.com/weavejester/environ
@@ -53,7 +51,7 @@
         ;; Linter https://github.com/jonase/eastwood
         [jonase/eastwood "0.2.6-beta2"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
-        [lein-kibit "0.1.6-beta2" :exclusions [org.clojure/clojure]]
+        [lein-kibit "0.1.6" :exclusions [org.clojure/clojure]]
       ]
     }
 
@@ -78,7 +76,7 @@
         ;; Runs bikeshed, kibit and eastwood https://github.com/itang/lein-checkall
         [lein-checkall "0.1.1"]
         ;; pretty-print the lein project map https://github.com/technomancy/leiningen/tree/master/lein-pprint
-        [lein-pprint "1.1.2"]
+        [lein-pprint "1.2.0"]
         ;; Check for outdated dependencies https://github.com/xsc/lein-ancient
         [lein-ancient "0.6.14"]
         ;; Catch spelling mistakes in docs and docstrings https://github.com/cldwalker/lein-spell
