@@ -28,8 +28,8 @@
 (defn echo-config []
   (println (str "\n"
     "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
-    "Sentry: " c/dsn "\n\n"
-    "AWS Elastic Search Endpoint" c/elastic-search-endpoint
+    "Sentry: " c/dsn "\n"
+    "Elastic Search Endpoint: " c/elastic-search-endpoint "\n\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn start [port]
@@ -53,8 +53,8 @@
     "OpenCompany Search Service\n"))
   (echo-config)
 
-  (component/start (components/search-system)))
-
+  ;;(component/start (components/search-system)))
+  (timbre/debug (components/search-system))
   ;; Start the system, which will start long polling SQS
   (component/start (system {:sqs-queue c/aws-sqs-search-index-queue
                            :sqs-msg-handler sqs-handler

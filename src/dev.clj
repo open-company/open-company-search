@@ -2,14 +2,19 @@
   (:require [com.stuartsierra.component :as component]
             [clojure.tools.namespace.repl :as ctnrepl]
             [oc.search.config :as c]
+            [oc.search.components :as components]
             [oc.search.app :as app]))
 
 (def system nil)
 
-(defn init [] (alter-var-root #'system (constantly (app/system {:sqs-queue c/aws-sqs-search-index-queue
-                                                                :sqs-msg-handler app/sqs-handler
-                                                                :sqs-creds {:access-key c/aws-access-key-id
-                                                                            :secret-key c/aws-secret-access-key}}))))
+(defn init [] (alter-var-root
+               #'system
+               (constantly (components/search-system
+                            {:sqs-consumer
+                             {:sqs-queue c/aws-sqs-search-index-queue
+                              :message-handler app/sqs-handler
+                              :sqs-creds {:access-key c/aws-access-key-id
+                                          :secret-key c/aws-secret-access-key}}}))))
 
 (defn start []
   (alter-var-root #'system component/start))

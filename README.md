@@ -96,7 +96,8 @@ Make sure you update the section in `project.clj` that looks like this to contai
     :aws-secret-access-key "CHANGE-ME"
     :endpoint "us-east-1"
     :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
-    :elastic-search-endpoint 'https://ESDOMAIN.us-east-1.es.amazonaws.com/'
+    :elastic-search-endpoint 'https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN'
+    :elastic-search-index "CHANGE-ME"
 }
 ```
 
