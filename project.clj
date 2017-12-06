@@ -19,9 +19,9 @@
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
     [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]              
     ;; Library for Elastic search http://clojureelasticsearch.info/
-    [clojurewerkz/elastisch "2.2.1"]
+    [clojurewerkz/elastisch "2.2.1" :exclusions [cheshire "5.5.0"]]
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.8" :exclusions [commons-logging commons-codec com.fasterxml.jackson.core/jackson-databind]]
+    [open-company/lib "0.14.8"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
