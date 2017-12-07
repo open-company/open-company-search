@@ -1,0 +1,30 @@
+{
+  "org-slug": "green-labs",
+  "org-name": "GreenLabs",
+  "headline" : "July 2017 Update",
+  "publisher" : {
+    "avatar-url" : "/img/ML/happy_face_green.svg",
+    "name" : "I has email",
+    "user-id" : "80d5-457a-b95d"
+  },
+  "secure-uuid": "1234-abcd-1234",
+  "updated-at" : "2017-11-20T15:29:13.201Z",
+  "published-at": "2017-08-24T23:14:20.765Z",
+  "shared-at": "2017-08-25T23:14:20.765Z",
+  "created-at" : "2017-11-15T19:52:09.096Z",
+  "author" : [ {
+    "avatar-url" : "/img/ML/happy_face_green.svg",
+    "name" : "I has email",
+    "updated-at" : "2017-11-15T19:52:09.096Z",
+    "user-id" : "80d5-457a-b95d"
+  }, {
+    "avatar-url" : "/img/ML/happy_face_green.svg",
+    "name" : "I has email",
+    "updated-at" : "2017-11-20T15:29:13.201Z",
+    "user-id" : "80d5-457a-b95d"
+  } ],
+  "status" : "published",
+  "uuid" : "0f04-4c43-befa",
+  "body" : "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a,"
+}
+

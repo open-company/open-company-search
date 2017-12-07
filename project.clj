@@ -20,7 +20,7 @@
     [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]              
     ;; Library for Elastic search http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
-    [clojurewerkz/elastisch "2.2.1" :exclusions [cheshire]]
+    [clojurewerkz/elastisch "3.0.0-beta2" :exclusions [cheshire]]
     ;; Library for OC projects https://github.com/open-company/open-company-lib
     [open-company/lib "0.14.8"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
