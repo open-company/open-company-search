@@ -1,10 +1,12 @@
 (ns oc.search.elastic-search
    (:require [taoensso.timbre :as timbre]
              [slingshot.slingshot :as slingshot]
+             [clojure.walk :refer (keywordize-keys)]
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
              [oc.search.config :as c]))
+
 
 (defonce mapping-types
   {:entry {:properties {:org-slug     {:type "text" :store "yes" :index false}
@@ -52,7 +54,27 @@
 (defn stop [])
 
 
+(defn- map-entry
+  [entry]
+  {:org-slug (:org-slug entry)
+   :org-name (:org-name entry)
+   :author-id (:user-id (:author entry))
+   :author-name (:name (:author entry))
+   :author-url (:avatar-url (:author entry))
+   :headline (:headline entry)
+   :secure-uuid (:secure-uuid entry)
+   :uuid (:uuid entry)
+   :status (:status entry)
+   :updated-at (:updated-at entry)
+   :published-at (:published-at entry)
+   :shared-at (:shared-at entry)
+   :created-at (:created-at entry)
+   :body (:body entry)})
+
 (defn add-index
-  [entity-data]
-  
-  )
+  [entry-data]
+  (let [conn (esr/connect c/elastic-search-endpoint)
+        index (str c/elastic-search-index)
+        entry (:entry (keywordize-keys entry-data))]
+    (timbre/info
+     (doc/upsert conn index "entry" (:uuid entry) (map-entry entry)))))
