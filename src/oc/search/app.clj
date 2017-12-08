@@ -3,6 +3,7 @@
   (:require [com.stuartsierra.component :as component]
             [manifold.stream :as stream]
             [taoensso.timbre :as timbre]
+            [cheshire.core :as json]
             [oc.search.config :as c]
             [oc.lib.sentry-appender :as sentry]
             [oc.lib.sqs :as sqs]
@@ -10,8 +11,8 @@
             [oc.search.core :as ocsearch]))
 
 (defn sqs-handler [msg done-channel]
-  (let [msg-body (read-string (:body msg))
-        msg-type (:type msg-body)
+  (let [msg-body (json/parse-string (:body msg) true)
+        msg-type (:resource-type msg-body)
         error (if (:test-error msg-body) (/ 1 0) false)] ; test Sentry error reporting
     (timbre/info "Received message from SQS.")
     (timbre/tracef "\nMessage from SQS: %s\n" msg-body)
@@ -72,7 +73,7 @@
   ;; SQS message payload
   (def entry (json/decode (slurp "./opt/samples/updates/green-labs.json")))
   (def message 
-    {:type "entry-index"
+    {:resource-type "entry-index"
      :org-slug "green-labs"
      :entry entry})
 

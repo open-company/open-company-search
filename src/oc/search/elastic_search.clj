@@ -75,6 +75,7 @@
   [entry-data]
   (let [conn (esr/connect c/elastic-search-endpoint)
         index (str c/elastic-search-index)
-        entry (:entry (keywordize-keys entry-data))]
+        entry (:entry entry-data)]
+    (timbre/debug entry-data)
     (timbre/info
      (doc/upsert conn index "entry" (:uuid entry) (map-entry entry)))))

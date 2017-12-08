@@ -5,6 +5,6 @@
 
 
 (defn entry-index
-  [entity-data]
+  [entry-data]
   (timbre/debug "received entry to index.")
-  (es/add-index entity-data))
+  (es/add-index entry-data))
