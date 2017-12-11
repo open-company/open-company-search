@@ -9,6 +9,7 @@
 
 ;; ----- System -----
 
+(defonce prod? (= "production" (env :env)))
 (defonce intro? (bool (or (env :intro ) false)))
 
 ;; ----- Logging -----
@@ -34,3 +35,18 @@
 ;; ----- Elastic Search -----
 (defonce elastic-search-endpoint (env :elastic-search-endpoint))
 (defonce elastic-search-index (env :elastic-search-index))
+
+;; ----- HTTP server -----
+
+(defonce hot-reload (bool (or (env :hot-reload) false)))
+(defonce search-server-port (Integer/parseInt (or (env :port) "3008")))
+
+;; ----- Liberator -----
+
+;; see header response, or http://localhost:3000/x-liberator/requests/ for trace results
+(defonce liberator-trace (bool (or (env :liberator-trace) false)))
+(defonce pretty? (not prod?)) ; JSON response as pretty?
+
+;; ----- JWT -----
+
+(defonce passphrase (env :open-company-auth-passphrase))

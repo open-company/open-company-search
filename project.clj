@@ -12,12 +12,18 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.9.0-RC2"]
+    [org.clojure/clojure "1.9.0"]
     ;; Async programming tools https://github.com/ztellman/manifold
     [manifold "0.1.7-alpha6"]
     ;; Namespace management https://github.com/clojure/tools.namespace
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
-    [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]              
+    [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]
+    [ring/ring-devel "1.6.3"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-core "1.6.3"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-json "0.5.0-beta1"] ; JSON request/response https://github.com/ring-clojure/ring-json
+    [jumblerg/ring.middleware.cors "1.0.1"] ; CORS library https://github.com/jumblerg/ring.middleware.cors
+    [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
+    [compojure "1.6.0"] ; Web routing https://github.com/weavejester/compojure
     ;; Library for Elastic search http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
     [clojurewerkz/elastisch "3.0.0-beta2" :exclusions [cheshire]]
