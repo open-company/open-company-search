@@ -5,6 +5,7 @@
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
+             [clojurewerkz.elastisch.query :as q]
              [oc.search.config :as c]))
 
 
@@ -79,3 +80,10 @@
     (timbre/debug entry-data)
     (timbre/info
      (doc/upsert conn index "entry" (:uuid entry) (map-entry entry)))))
+
+(defn search
+  [query-params]
+  (let [conn (esr/connect c/elastic-search-endpoint)
+        index (str c/elastic-search-index)
+        params (keywordize-keys query-params)]
+    (doc/search-all-types conn index {:query (q/match :body (:q params))})))

@@ -2,9 +2,11 @@
   "API to search data in elastic search."
   (:require [compojure.core :as compojure :refer (GET)]
             [taoensso.timbre :as timbre]
+            [cheshire.core :as json]
             [liberator.core :refer (defresource by-method)]
             [oc.lib.api.common :as api-common]
-            [oc.search.config :as config]))
+            [oc.search.config :as config]
+            [oc.search.elastic-search :as esearch]))
 
 (defonce search-media-type "application/vnd.open-company.search.v1+json")
 
@@ -12,8 +14,16 @@
 
 (defn stop [])
 
+(defn- handle-search
+  [params ctx]
+  (timbre/debug params)
+  (let [result (esearch/search params)]
+    (timbre/debug result)
+    (json/generate-string
+     (:hits result)
+     {:pretty config/pretty?})))
 
-(defresource search []
+(defresource search [params]
   (api-common/open-company-authenticated-resource config/passphrase) ; verify validity and presence of required JWToken
   :allowed-methods [:options :get]
 
@@ -37,7 +47,7 @@
   ;; Responses
   :handle-ok (fn [ctx]
                (timbre/debug "Searching")
-               ctx)
+               (handle-search params ctx))
   :handle-no-content (fn [ctx] (when-not (:existing? ctx) (api-common/missing-response))))
 
 ;; ----- Routes -----
@@ -45,5 +55,5 @@
 (defn routes [sys]
   (compojure/routes
    ;; Comment listing and creation
-   (GET "/search/" []
-        (search))))
+   (GET "/search/" {params :query-params}
+        (search params))))
