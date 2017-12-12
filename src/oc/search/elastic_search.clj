@@ -56,30 +56,35 @@
 
 
 (defn- map-entry
-  [entry]
-  {:org-slug (:org-slug entry)
-   :org-name (:org-name entry)
-   :author-id (:user-id (:author entry))
-   :author-name (:name (:author entry))
-   :author-url (:avatar-url (:author entry))
-   :headline (:headline entry)
-   :secure-uuid (:secure-uuid entry)
-   :uuid (:uuid entry)
-   :status (:status entry)
-   :updated-at (:updated-at entry)
-   :published-at (:published-at entry)
-   :shared-at (:shared-at entry)
-   :created-at (:created-at entry)
-   :body (:body entry)})
+  [entry-data]
+  (let [entry (:entry entry-data)]
+    {:org-slug (:org-slug entry-data)
+     :org-name (:org-name entry-data)
+     :org-uuid (:org-uuid entry-data)
+     :board-uuid (:board-uuid entry)
+     :board-name (:board-name entry-data)
+     :board-slug (:board-slug entry-data)
+     :author-id (:user-id (last (:author entry)))
+     :author-name (:name (last (:author entry)))
+     :author-url (:avatar-url (last (:author entry)))
+     :headline (:headline entry)
+     :secure-uuid (:secure-uuid entry)
+     :uuid (:uuid entry)
+     :status (:status entry)
+     :updated-at (:updated-at entry)
+     :published-at (:published-at entry)
+     :shared-at (:shared-at (last (:shared entry)))
+     :created-at (:created-at entry)
+     :body (:body entry)}))
 
 (defn add-index
   [entry-data]
   (let [conn (esr/connect c/elastic-search-endpoint)
-        index (str c/elastic-search-index)
-        entry (:entry entry-data)]
+        index (str c/elastic-search-index)]
     (timbre/debug entry-data)
+    (timbre/debug (map-entry entry-data))
     (timbre/info
-     (doc/upsert conn index "entry" (:uuid entry) (map-entry entry)))))
+     (doc/upsert conn index "entry" (:uuid (:entry entry-data)) (map-entry entry-data)))))
 
 (defn search
   [query-params]
@@ -87,3 +92,9 @@
         index (str c/elastic-search-index)
         params (keywordize-keys query-params)]
     (doc/search-all-types conn index {:query (q/match :body (:q params))})))
+
+(defn delete
+  [uuid]
+  (let [conn (esr/connect c/elastic-search-endpoint)
+        index (str c/elastic-search-index)]
+        doc/delete index "entry" uuid))
