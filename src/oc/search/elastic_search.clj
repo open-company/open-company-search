@@ -99,6 +99,14 @@
      :org-name (:org-name data)
      :org-uuid (:org-uuid data)
      :org-team-id (:org-team-id data)
+     :uuid (:uuid board)
+     :updated-at (:updated-at board)
+     :created-at (:created-at board)
+     :slug (:slug board)
+     :name (:name board)
+     :author-id (:user-id (:author board))
+     :author-name (:name (:author board))
+     :author-url (:avatar-url (:author board))
      }))
 
 (defn- map-data
@@ -135,20 +143,17 @@
   (if value
     (let [search-query (query-type (:bool query))
           adding {search-term {field value}}
-          new-filter (if search-query
-                       (conj search-query adding)
-                       adding)]
-
-      (assoc-in query [:bool query-type] new-filter))
+          new-search (vec (cons adding search-query))]
+      (assoc-in query [:bool query-type] new-search))
     query))
 
 (defn- add-filter
   [query field value]
   (add-to-query query :filter :term field value))
 
-(defn- add-must-match
+(defn- add-should-match
   [query field value]
-  (add-to-query query :must :match field value))
+  (add-to-query query :should :match field value))
 
 (defn search
   [teams query-params]
@@ -156,11 +161,17 @@
         index (str c/elastic-search-index)
         params (keywordize-keys query-params)
         filtered (add-filter (filter-by-team teams) :org-uuid.keyword (:org params))
-        query (add-must-match filtered :body (:q params))]
-    (timbre/debug params)
-    (timbre/debug filtered)
-    (timbre/debug query)
-    (doc/search-all-types conn index {:query query})))
+        query (-> filtered
+                  (add-should-match :body (:q params))
+                  (add-should-match :headline (:q params))
+                  (add-should-match :author-name (:q params))
+                  (add-should-match :uuid (:q params))
+                  (add-should-match :name (:q params))
+                  (add-should-match :slug (:q params))
+                  )]
+    (doc/search-all-types conn index {:query query
+                                      :min_score "0.01"
+                                      })))
 
 ;; Delete
 (defn- delete

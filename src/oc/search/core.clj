@@ -10,9 +10,9 @@
   (es/add-entry-index entry-data))
 
 (defn delete-entry
-  [uuid]
+  [data]
   (timbre/debug "received entry to delete.")
-  (es/delete-entry uuid))
+  (es/delete-entry data))
 
 
 (defn index-board
