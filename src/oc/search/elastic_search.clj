@@ -10,21 +10,26 @@
 
 
 (defonce mapping-types
-  {:entry {:properties {:org-slug     {:type "text" :store "yes" :index false}
-                        :org-name     {:type "text" :store "yes" :index false}
-                        :headline     {:type "text" :analyzer "snowball"}
-                        :author-url   {:type "text" }
-                        :author-name  {:type "text" }
-                        :author-id    {:type "text"}
-                        :secure-uuid  {:type "text"}
-                        :uuid         {:type "text"}
-                        :status       {:type "text"}
-                        :updated-at   {:type "date"}
-                        :published-at {:type "date"}
-                        :shared-at    {:type "date"}
-                        :created-at   {:type "date"}
-                        :body         {:type "text" :analyzer "snowball"
-                                       :term_vector "with_positions_offsets"}}
+  {:entry {:properties {:org-slug      {:type "text" :store "yes" :index false}
+                        :org-name      {:type "text" :store "yes" :index false}
+                        :org-uuid      {:type "text"}
+                        :org-team-uuid {:type "text"}
+                        :board-uuid    {:type "text"}
+                        :board-name    {:type "text"}
+                        :board-slug    {:type "text"}
+                        :headline      {:type "text" :analyzer "snowball"}
+                        :author-url    {:type "text" }
+                        :author-name   {:type "text" }
+                        :author-id     {:type "text"}
+                        :secure-uuid   {:type "text"}
+                        :uuid          {:type "text"}
+                        :status        {:type "text"}
+                        :updated-at    {:type "date"}
+                        :published-at  {:type "date"}
+                        :shared-at     {:type "date"}
+                        :created-at    {:type "date"}
+                        :body          {:type "text" :analyzer "snowball"
+                                        :term_vector "with_positions_offsets"}}
            }})
 
 (defn- create-index
@@ -61,6 +66,7 @@
     {:org-slug (:org-slug entry-data)
      :org-name (:org-name entry-data)
      :org-uuid (:org-uuid entry-data)
+     :org-team-id (:org-team-id entry-data)
      :board-uuid (:board-uuid entry)
      :board-name (:board-name entry-data)
      :board-slug (:board-slug entry-data)
@@ -77,6 +83,7 @@
      :created-at (:created-at entry)
      :body (:body entry)}))
 
+;; Upsert
 (defn add-index
   [entry-data]
   (let [conn (esr/connect c/elastic-search-endpoint)
@@ -86,13 +93,44 @@
     (timbre/info
      (doc/upsert conn index "entry" (:uuid (:entry entry-data)) (map-entry entry-data)))))
 
+;; Search
+(defn- filter-by-team
+  [teams]
+  (q/bool {:filter (vec (map (fn [team] {:term {:org-team-id.keyword team}}) teams))}))
+
+(defn- add-to-query
+  [query query-type search-term field value]
+  (if value
+    (let [search-query (query-type (:bool query))
+          adding {search-term {field value}}
+          new-filter (if search-query
+                       (conj search-query adding)
+                       adding)]
+
+      (assoc-in query [:bool query-type] new-filter))
+    query))
+
+(defn- add-filter
+  [query field value]
+  (add-to-query query :filter :term field value))
+
+(defn- add-must-match
+  [query field value]
+  (add-to-query query :must :match field value))
+
 (defn search
-  [query-params]
+  [teams query-params]
   (let [conn (esr/connect c/elastic-search-endpoint)
         index (str c/elastic-search-index)
-        params (keywordize-keys query-params)]
-    (doc/search-all-types conn index {:query (q/match :body (:q params))})))
+        params (keywordize-keys query-params)
+        filtered (add-filter (filter-by-team teams) :org-uuid.keyword (:org params))
+        query (add-must-match filtered :body (:q params))]
+    (timbre/debug params)
+    (timbre/debug filtered)
+    (timbre/debug query)
+    (doc/search-all-types conn index {:query query})))
 
+;; Delete
 (defn delete
   [uuid]
   (let [conn (esr/connect c/elastic-search-endpoint)

@@ -16,8 +16,8 @@
 
 (defn- handle-search
   [params ctx]
-  (timbre/debug params)
-  (let [result (esearch/search params)]
+  (let [teams (:teams (:user ctx))
+        result (esearch/search teams params)]
     (timbre/debug result)
     (json/generate-string
      (:hits result)
