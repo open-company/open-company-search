@@ -7,9 +7,21 @@
 (defn index-entry
   [entry-data]
   (timbre/debug "received entry to index.")
-  (es/add-index entry-data))
+  (es/add-entry-index entry-data))
 
 (defn delete-entry
   [uuid]
-  (timbre/debug "received entry to index.")
-  (es/delete uuid))
+  (timbre/debug "received entry to delete.")
+  (es/delete-entry uuid))
+
+
+(defn index-board
+  [board-data]
+  (timbre/debug "received board to index.")
+  (es/add-board-index board-data))
+
+
+(defn delete-board
+  [board-data]
+  (timbre/debug "received board to delete.")
+  (es/delete-board board-data))

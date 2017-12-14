@@ -30,6 +30,15 @@
                         :created-at    {:type "date"}
                         :body          {:type "text" :analyzer "snowball"
                                         :term_vector "with_positions_offsets"}}
+           }
+   :board {:properties {:org-slug      {:type "text" :store "yes" :index false}
+                        :org-name      {:type "text" :store "yes" :index false}
+                        :org-uuid      {:type "text"}
+                        :org-team-uuid {:type "text"}
+                        :uuid          {:type "text"}
+                        :name          {:type "text"}
+                        :slug          {:type "text"}
+                        }
            }})
 
 (defn- create-index
@@ -59,17 +68,17 @@
 
 (defn stop [])
 
-
+;; Indexing data
 (defn- map-entry
-  [entry-data]
-  (let [entry (:entry entry-data)]
-    {:org-slug (:org-slug entry-data)
-     :org-name (:org-name entry-data)
-     :org-uuid (:org-uuid entry-data)
-     :org-team-id (:org-team-id entry-data)
+  [data]
+  (let [entry (:entry data)]
+    {:org-slug (:org-slug data)
+     :org-name (:org-name data)
+     :org-uuid (:org-uuid data)
+     :org-team-id (:org-team-id data)
      :board-uuid (:board-uuid entry)
-     :board-name (:board-name entry-data)
-     :board-slug (:board-slug entry-data)
+     :board-name (:board-name data)
+     :board-slug (:board-slug data)
      :author-id (:user-id (last (:author entry)))
      :author-name (:name (last (:author entry)))
      :author-url (:avatar-url (last (:author entry)))
@@ -83,15 +92,38 @@
      :created-at (:created-at entry)
      :body (:body entry)}))
 
+(defn- map-board
+  [data]
+  (let [board (:board data)]
+    {:org-slug (:org-slug data)
+     :org-name (:org-name data)
+     :org-uuid (:org-uuid data)
+     :org-team-id (:org-team-id data)
+     }))
+
+(defn- map-data
+  [data]
+  (cond
+   (:entry data) (map-entry data)
+   (:board data) (map-board data)))
+
 ;; Upsert
-(defn add-index
-  [entry-data]
+(defn- add-index
+  [data-type data]
   (let [conn (esr/connect c/elastic-search-endpoint)
         index (str c/elastic-search-index)]
-    (timbre/debug entry-data)
-    (timbre/debug (map-entry entry-data))
+    (timbre/debug data)
+    (timbre/debug (map-data data))
     (timbre/info
-     (doc/upsert conn index "entry" (:uuid (:entry entry-data)) (map-entry entry-data)))))
+     (doc/upsert conn index data-type (:uuid ((keyword data-type) data)) (map-data data)))))
+
+(defn add-entry-index
+  [entry-data]
+  (add-index "entry" entry-data))
+
+(defn add-board-index
+  [board-data]
+  (add-index "board" board-data))
 
 ;; Search
 (defn- filter-by-team
@@ -131,8 +163,17 @@
     (doc/search-all-types conn index {:query query})))
 
 ;; Delete
-(defn delete
-  [uuid]
-  (let [conn (esr/connect c/elastic-search-endpoint)
+(defn- delete
+  [index-type data]
+  (let [uuid (:uuid ((keyword index-type) data))
+        conn (esr/connect c/elastic-search-endpoint)
         index (str c/elastic-search-index)]
-        doc/delete index "entry" uuid))
+    (doc/delete conn index index-type uuid)))
+
+(defn delete-entry
+  [data]
+  (delete "entry" data))
+
+(defn delete-board
+  [data]
+  (delete "board" data))

@@ -29,7 +29,9 @@
     (timbre/tracef "\nMessage from SQS: %s\n" msg-body)
     (case msg-type
       "entry-index" (ocsearch/index-entry msg-body)
-      "delete-index" (ocsearch/delete-entry msg-body)
+      "entry-delete" (ocsearch/delete-entry msg-body)
+      "board-index" (ocsearch/index-board msg-body)
+      "board-delete" (ocsearch/delete-board msg-body)
       (timbre/error "Unrecognized message type" msg-type)))
   (sqs/ack done-channel msg))
 
