@@ -79,7 +79,13 @@
        (timbre/error ex "Uncaught exception on" (.getName thread) (.getMessage ex)))))
 
   ;; Start the system
-  (-> {:handler-fn app :port port}
+  (-> {:handler-fn app
+       :port port
+       :sqs-consumer
+       {:sqs-queue c/aws-sqs-search-index-queue
+        :message-handler app/sqs-handler
+        :sqs-creds {:access-key c/aws-access-key-id
+                    :secret-key c/aws-secret-access-key}}}
       components/search-system
       component/start)
 
