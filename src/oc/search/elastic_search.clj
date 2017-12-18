@@ -59,9 +59,9 @@
           mapping (idx/get-mapping conn index)]
       (timbre/debug exists? request-exists? mapping)
       (when (not exists?)
-        (timbre/debug "index does not exist...creating.")
+        (timbre/info "index does not exist...creating.")
         (slingshot/try+
-         (timbre/debug (create-index conn index {:mappings mapping-types :settings {}}))
+         (timbre/info (create-index conn index {:mappings mapping-types :settings {}}))
          (catch [:status 400] {:keys [request-time headers body]}
            (timbre/error request-time headers body)))))
     conn))
