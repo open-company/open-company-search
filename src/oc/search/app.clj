@@ -35,13 +35,8 @@
       (timbre/error "Unrecognized message type" msg-type)))
   (sqs/ack done-channel msg))
 
-(defn system [config-options]
-  (let [{:keys [sqs-creds sqs-queue sqs-msg-handler]} config-options]
-    (component/system-map
-      :sqs (sqs/sqs-listener sqs-creds sqs-queue sqs-msg-handler))))
 
 ;; ----- Request Routing -----
-
 (defn routes [sys]
   (compojure/routes
     (GET "/ping" [] {:body "OpenCompany Search Service: OK" :status 200}) ; Up-time monitor
@@ -89,15 +84,10 @@
     "OpenCompany Search Service\n"))
   (echo-config)
 
-  ;;(component/start (components/search-system)))
-  (timbre/debug (components/search-system))
-  ;; Start the system, which will start long polling SQS
-  (component/start (system {:handler-fn app
-                            :port port
-                            :sqs-queue c/aws-sqs-search-index-queue
-                            :sqs-msg-handler sqs-handler
-                            :sqs-creds {:access-key c/aws-access-key-id
-                                        :secret-key c/aws-secret-access-key}}))
+  ;; Start the system
+  (-> {:handler-fn app :port port}
+      components/search-system
+      component/start)
 
   (deref (stream/take! (stream/stream)))) ; block forever
 
