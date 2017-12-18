@@ -39,7 +39,7 @@
 ;; ----- HTTP server -----
 
 (defonce hot-reload (bool (or (env :hot-reload) false)))
-(defonce search-server-port (Integer/parseInt (or (env :port) "3008")))
+(defonce search-server-port (Integer/parseInt (or (env :port) "3007")))
 
 ;; ----- Liberator -----
 
