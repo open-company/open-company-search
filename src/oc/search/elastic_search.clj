@@ -50,7 +50,7 @@
                       {:settings settings})})))
 
 (defn start []
-  (let [conn (esr/connect c/elastic-search-endpoint)
+  (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
     (timbre/debug "connected...does index exist?" index)
     ;; query for index, if not there create
@@ -125,7 +125,7 @@
 ;; Upsert
 (defn- add-index
   [data-type data]
-  (let [conn (esr/connect c/elastic-search-endpoint)
+  (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
     (timbre/debug data)
     (timbre/debug (map-data data))
@@ -164,7 +164,7 @@
 
 (defn search
   [teams query-params]
-  (let [conn (esr/connect c/elastic-search-endpoint)
+  (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
         params (keywordize-keys query-params)
         filtered (add-filter (filter-by-team teams) :org-uuid.keyword (:org params))
@@ -184,7 +184,7 @@
 (defn- delete
   [index-type data]
   (let [uuid (:uuid ((keyword index-type) data))
-        conn (esr/connect c/elastic-search-endpoint)
+        conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
     (doc/delete conn index index-type uuid)))
 
