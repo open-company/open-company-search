@@ -69,6 +69,13 @@
 (defn stop [])
 
 ;; Indexing data
+(defn- map-authors
+  "
+  Create multi-value fields for authors
+  "
+  [attr authors]
+  (vec (distinct (map (fn [author] (attr author)) authors))))
+
 (defn- map-entry
   [data]
   (let [entry (:entry data)]
@@ -79,9 +86,9 @@
      :board-uuid (:board-uuid entry)
      :board-name (:board-name data)
      :board-slug (:board-slug data)
-     :author-id (:user-id (last (:author entry)))
-     :author-name (:name (last (:author entry)))
-     :author-url (:avatar-url (last (:author entry)))
+     :author-id (map-authors :user-id (:author entry))
+     :author-name (map-authors :name (:author entry))
+     :author-url (map-authors :avatar-url (:author entry))
      :headline (:headline entry)
      :secure-uuid (:secure-uuid entry)
      :uuid (:uuid entry)
