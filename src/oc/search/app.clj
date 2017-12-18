@@ -78,18 +78,16 @@
      (uncaughtException [_ thread ex]
        (timbre/error ex "Uncaught exception on" (.getName thread) (.getMessage ex)))))
 
-  ;; Echo config information
-  (println (str "\n"
-    (when c/intro? (str (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"))
-    "OpenCompany Search Service\n"))
-  (echo-config)
-
   ;; Start the system
   (-> {:handler-fn app :port port}
       components/search-system
       component/start)
 
-  (deref (stream/take! (stream/stream)))) ; block forever
+  ;; Echo config information
+  (println (str "\n"
+    (when c/intro? (str (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"))
+    "OpenCompany Search Service\n"))
+  (echo-config))
 
 (defn -main []
-  (start))
+  (start c/search-server-port))
