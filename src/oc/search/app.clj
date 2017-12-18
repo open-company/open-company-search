@@ -83,7 +83,7 @@
        :port port
        :sqs-consumer
        {:sqs-queue c/aws-sqs-search-index-queue
-        :message-handler app/sqs-handler
+        :message-handler sqs-handler
         :sqs-creds {:access-key c/aws-access-key-id
                     :secret-key c/aws-secret-access-key}}}
       components/search-system
