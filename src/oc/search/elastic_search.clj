@@ -71,15 +71,20 @@
 
 (defn- map-entry
   [data]
-  (let [entry (:entry data)]
+  (let [entry (:new (:content data))
+        org (:org data)
+        board (:board data)]
+    (timbre/debug org)
+    (timbre/debug board)
+    (timbre/debug entry)
     {:type "entry"
-     :org-slug (:org-slug data)
-     :org-name (:org-name data)
-     :org-uuid (:org-uuid data)
-     :org-team-id (:org-team-id data)
-     :board-uuid (:board-uuid entry)
-     :board-name (:board-name data)
-     :board-slug (:board-slug data)
+     :org-slug (:slug org)
+     :org-name (:name org)
+     :org-uuid (:uuid org)
+     :org-team-id (:team-id org)
+     :board-uuid (:uuid board)
+     :board-name (:name board)
+     :board-slug (:slug board)
      :author-id (map-authors :user-id (:author entry))
      :author-name (map-authors :name (:author entry))
      :author-url (map-authors :avatar-url (:author entry))
@@ -95,12 +100,15 @@
 
 (defn- map-board
   [data]
-  (let [board (:board data)]
+  (let [org (:org data)
+        board (:new (:content data))]
+    (timbre/debug org)
+    (timbre/debug board)
     {:type "board"
-     :org-slug (:org-slug data)
-     :org-name (:org-name data)
-     :org-uuid (:org-uuid data)
-     :org-team-id (:org-team-id data)
+     :org-slug (:slug org)
+     :org-name (:name org)
+     :org-uuid (:uuid org)
+     :org-team-id (:team-id org)
      :uuid (str "board-" (:uuid board))
      :updated-at (:updated-at board)
      :created-at (:created-at board)
@@ -114,18 +122,19 @@
 (defn- map-data
   [data]
   (cond
-   (:entry data) (map-entry data)
-   (:board data) (map-board data)))
+   (= "entry" (:resource-type data)) (map-entry data)
+   (= "board" (:resource-type data)) (map-board data)))
 
 ;; Upsert
 (defn- add-index
   [data-type data]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
-        index (str c/elastic-search-index)]
+        index (str c/elastic-search-index)
+        id (str data-type "-" (:uuid (:new (:content data))))]
     (timbre/info data)
     (timbre/info (map-data data))
     (timbre/info
-     (doc/upsert conn index "doc" (str data-type "-" (:uuid ((keyword data-type) data))) (map-data data)))))
+     (doc/upsert conn index "doc" id (map-data data)))))
 
 (defn add-entry-index
   [entry-data]
@@ -178,7 +187,7 @@
 ;; Delete
 (defn- delete
   [data-type data]
-  (let [uuid (:uuid ((keyword data-type) data))
+  (let [uuid (:uuid (:old (:content data)))
         conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
     (timbre/info (doc/delete conn index "doc" (str data-type "-" uuid)))))

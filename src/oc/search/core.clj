@@ -3,7 +3,6 @@
   (:require [taoensso.timbre :as timbre]
             [oc.search.elastic-search :as es]))
 
-
 (defn index-entry
   [entry-data]
   (timbre/debug "received entry to index.")

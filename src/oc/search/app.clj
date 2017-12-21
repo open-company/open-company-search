@@ -22,17 +22,18 @@
             [oc.search.api :as search-api]))
 
 (defn sqs-handler [msg done-channel]
-  (let [msg-body (json/parse-string (:body msg) true)
-        msg-type (:resource-type msg-body)
+  (let [msg-sns-body (json/parse-string (:body msg) true)
+        msg-body (json/parse-string (:Message msg-sns-body) true)
+        msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))
         error (if (:test-error msg-body) (/ 1 0) false)] ; test Sentry error reporting
     (timbre/info "Received message from SQS.")
-    (timbre/tracef "\nMessage from SQS: %s\n" msg-body)
+    (timbre/debug "\nMessage from SQS: " msg-body)
     (case msg-type
       "entry-index" (ocsearch/index-entry msg-body)
       "entry-delete" (ocsearch/delete-entry msg-body)
       "board-index" (ocsearch/index-board msg-body)
       "board-delete" (ocsearch/delete-board msg-body)
-      (timbre/error "Unrecognized message type" msg-type)))
+      (timbre/error "Unrecognized message type" msg-body)))
   (sqs/ack done-channel msg))
 
 
