@@ -30,7 +30,7 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 ## Overview
 
-The OpenCompany Search Service handles searching of data in the OpenCompany system.
+The OpenCompany Search Service handles searching of data in the OpenCompany system. The service uses Elastic Search (v6.0) for indexing and searching data.
 
 
 ## Local Setup
@@ -41,7 +41,6 @@ Most of the dependencies are internal, meaning [Leiningen](https://github.com/te
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8+ JRE is needed to run Clojure
 * [Leiningen](https://github.com/technomancy/leiningen) 2.5.1+ - Clojure's build and dependency management tool
-* [Node.js](https://nodejs.org/en/) v6.11.2+ - JavaScript runtime
 
 #### Java
 
@@ -70,18 +69,15 @@ cd open-company-search
 lein deps
 ```
 
-#### Node.js
+#### Elastic Search
 
-For Mac OS X, download the latest long-term support (LTS) `.pkg` installer from the [Node.js download page](https://nodejs.org/en/download/). Double click the package to run it.
+This code is used with Elastic Search 6.0. The service uses the Elastic Search, REST API and only supports IP based access control.  The Elastic Search endpoint and index name are the two configuration options needed.
 
-For Linux, install nodejs with your distribution's preferred package manager, e.g. `sudo apt-get install build-essential nodejs nodejs-legacy npm`.
+For local setup see: https://www.elastic.co/downloads/elasticsearch and use http://localhost:9200 as your endpoint.
 
-You can verify your Node.js installation by running:
+For amazon see: http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html
 
-```console
-node -v
-npm -v
-```
+Amazon will give you the endpoint after setup.
 
 #### Required Configuration & Secrets
 
