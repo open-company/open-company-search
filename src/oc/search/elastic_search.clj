@@ -10,36 +10,29 @@
 
 
 (defonce mapping-types
-  {:entry {:properties {:org-slug      {:type "text" :store "yes" :index false}
-                        :org-name      {:type "text" :store "yes" :index false}
-                        :org-uuid      {:type "text"}
-                        :org-team-uuid {:type "text"}
-                        :board-uuid    {:type "text"}
-                        :board-name    {:type "text"}
-                        :board-slug    {:type "text"}
-                        :headline      {:type "text" :analyzer "snowball"}
-                        :author-url    {:type "text" }
-                        :author-name   {:type "text" }
-                        :author-id     {:type "text"}
-                        :secure-uuid   {:type "text"}
-                        :uuid          {:type "text"}
-                        :status        {:type "text"}
-                        :updated-at    {:type "date"}
-                        :published-at  {:type "date"}
-                        :shared-at     {:type "date"}
-                        :created-at    {:type "date"}
-                        :body          {:type "text" :analyzer "snowball"
-                                        :term_vector "with_positions_offsets"}}
-           }
-   :board {:properties {:org-slug      {:type "text" :store "yes" :index false}
-                        :org-name      {:type "text" :store "yes" :index false}
-                        :org-uuid      {:type "text"}
-                        :org-team-uuid {:type "text"}
-                        :uuid          {:type "text"}
-                        :name          {:type "text"}
-                        :slug          {:type "text"}
-                        }
-           }})
+  {:doc {:properties {:type          {:type "text"}
+                      :org-slug      {:type "text" :store true :index false}
+                      :org-name      {:type "text" :store true :index false}
+                      :org-uuid      {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :org-team-uuid {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :board-uuid    {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :board-name    {:type "text"}
+                      :board-slug    {:type "text"}
+                      :headline      {:type "text" :analyzer "snowball"}
+                      :author-url    {:type "text" }
+                      :author-name   {:type "text" }
+                      :author-id     {:type "text"}
+                      :secure-uuid   {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :uuid          {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :status        {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :name          {:type "text"}
+                      :slug          {:type "text"}
+                      :updated-at    {:type "date"}
+                      :published-at  {:type "date"}
+                      :shared-at     {:type "date"}
+                      :created-at    {:type "date"}
+                      :body          {:type "text" :analyzer "snowball"
+                                      :term_vector "with_positions_offsets"}}}})
 
 (defn- create-index
   [conn index-name opts]
@@ -79,7 +72,8 @@
 (defn- map-entry
   [data]
   (let [entry (:entry data)]
-    {:org-slug (:org-slug data)
+    {:type "entry"
+     :org-slug (:org-slug data)
      :org-name (:org-name data)
      :org-uuid (:org-uuid data)
      :org-team-id (:org-team-id data)
@@ -91,7 +85,7 @@
      :author-url (map-authors :avatar-url (:author entry))
      :headline (:headline entry)
      :secure-uuid (:secure-uuid entry)
-     :uuid (:uuid entry)
+     :uuid (str "entry-" (:uuid entry))
      :status (:status entry)
      :updated-at (:updated-at entry)
      :published-at (:published-at entry)
@@ -102,11 +96,12 @@
 (defn- map-board
   [data]
   (let [board (:board data)]
-    {:org-slug (:org-slug data)
+    {:type "board"
+     :org-slug (:org-slug data)
      :org-name (:org-name data)
      :org-uuid (:org-uuid data)
      :org-team-id (:org-team-id data)
-     :uuid (:uuid board)
+     :uuid (str "board-" (:uuid board))
      :updated-at (:updated-at board)
      :created-at (:created-at board)
      :slug (:slug board)
@@ -127,10 +122,10 @@
   [data-type data]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
-    (timbre/debug data)
-    (timbre/debug (map-data data))
+    (timbre/info data)
+    (timbre/info (map-data data))
     (timbre/info
-     (doc/upsert conn index data-type (:uuid ((keyword data-type) data)) (map-data data)))))
+     (doc/upsert conn index "doc" (str data-type "-" (:uuid ((keyword data-type) data))) (map-data data)))))
 
 (defn add-entry-index
   [entry-data]
@@ -172,26 +167,22 @@
                   (add-should-match :body (:q params))
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
-                  (add-should-match :uuid (:q params))
                   (add-should-match :name (:q params))
                   (add-should-match :slug (:q params))
                   )]
+    (timbre/debug query)
     (doc/search-all-types conn index {:query query
-                                      :min_score "0.01"
+                                      :min_score "0.001"
                                       })))
 
 ;; Delete
 (defn- delete
-  [index-type data]
-  (let [uuid (:uuid ((keyword index-type) data))
+  [data-type data]
+  (let [uuid (:uuid ((keyword data-type) data))
         conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)]
-    (doc/delete conn index index-type uuid)))
+    (timbre/info (doc/delete conn index "doc" (str data-type "-" uuid)))))
 
-(defn delete-entry
-  [data]
-  (delete "entry" data))
+(defn delete-entry [data] (delete "entry" data))
 
-(defn delete-board
-  [data]
-  (delete "board" data))
+(defn delete-board [data] (delete "board" data))
