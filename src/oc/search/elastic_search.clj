@@ -179,7 +179,7 @@
                   (add-should-match :name (:q params))
                   (add-should-match :slug (:q params))
                   )]
-    (timbre/debug query)
+    (timbre/info query)
     (doc/search-all-types conn index {:query query
                                       :min_score "0.001"
                                       })))

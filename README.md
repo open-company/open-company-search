@@ -99,6 +99,11 @@ Make sure you update the section in `project.clj` that looks like this to contai
 
 You can also override these settings with environmental variables in the form of `AWS_ACCESS_KEY_ID`, etc. Use environmental variables to provide production secrets when running in production.
 
+You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the aws console and follow these instruction:
+
+Go to https://console.aws.amazon.com/sqs/ and chose the search queue configured above. There will be a tab below called Permissions. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
+
+Next to go https://console.aws.amazon.com/sns/ and click Topics. Choose the storage topic you want to subscribe to. Next click 'Add Subscription'. In the dialog select SQS and paste in the ARN for the queue you used above.
 
 ## Usage
 
