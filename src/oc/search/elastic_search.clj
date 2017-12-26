@@ -147,24 +147,27 @@
 ;; Search
 (defn- filter-by-team
   [teams]
-  (q/bool {:filter (vec (map (fn [team] {:term {:org-team-id.keyword team}}) teams))}))
+  (q/bool {:filter (q/bool {:should (vec (map (fn [team]
+                                                {:term
+                                                 {:org-team-id.keyword team}})
+                                              teams))})}))
 
 (defn- add-to-query
   [query query-type search-term field value]
   (if value
-    (let [search-query (query-type (:bool query))
+    (let [search-query (get-in query query-type)
           adding {search-term {field value}}
           new-search (vec (cons adding search-query))]
-      (assoc-in query [:bool query-type] new-search))
+      (assoc-in query query-type new-search))
     query))
 
 (defn- add-filter
   [query field value]
-  (add-to-query query :filter :term field value))
+  (add-to-query query [:bool :filter :bool :should] :term field value))
 
 (defn- add-should-match
   [query field value]
-  (add-to-query query :should :match field value))
+  (add-to-query query [:bool :should] :match field value))
 
 (defn search
   [teams query-params]
