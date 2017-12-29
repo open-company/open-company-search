@@ -10,7 +10,7 @@
 
 
 (defonce mapping-types
-  {:doc {:properties {:type          {:type "text"}
+  {:doc {:properties {:type          {:type "text" :fields {:keyword {:type "keyword"}}}
                       :org-slug      {:type "text" :store true :index false}
                       :org-name      {:type "text" :store true :index false}
                       :org-uuid      {:type "text" :fields {:keyword {:type "keyword"}}}
@@ -174,8 +174,9 @@
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
         params (keywordize-keys query-params)
-        filtered (add-filter (filter-by-team teams) :org-uuid.keyword (:org params))
-        query (-> filtered
+        query (-> (filter-by-team teams)
+                  (add-to-query [:bool :filter :bool :must] :term :type.keyword "entry")
+                  (add-to-query [:bool :filter :bool :must] :term  :org-uuid.keyword (:org params))
                   (add-should-match :body (:q params))
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
