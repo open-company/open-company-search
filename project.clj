@@ -67,7 +67,7 @@
         :aws-access-key-id "CHANGE-ME"
         :aws-secret-access-key "CHANGE-ME"
         :aws-endpoint "us-east-1"
-        :aws-sqs-search-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
+        :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
         :intro "true"
         :log-level "debug"
       }
