@@ -16,8 +16,9 @@
 
 (defn- handle-search
   [params ctx]
-  (let [teams (:teams (:user ctx))
-        result (esearch/search teams params)]
+  (let [params_teams (assoc params :teams (:teams (:user ctx)))
+        params_user (assoc params_teams :uuid (:user-id (:user ctx)))
+        result (esearch/search params_user)]
     (timbre/debug result)
     (json/generate-string
      (:hits result)
