@@ -1,9 +1,7 @@
 (ns oc.search.app
   (:gen-class)
   (:require [com.stuartsierra.component :as component]
-            [manifold.stream :as stream]
             [taoensso.timbre :as timbre]
-            [ring.middleware.json :refer (wrap-json-body)]
             [ring.middleware.keyword-params :refer (wrap-keyword-params)]
             [ring.middleware.params :refer (wrap-params)]
             [ring.middleware.reload :refer (wrap-reload)]
@@ -12,7 +10,6 @@
             [cheshire.core :as json]
             [compojure.core :as compojure :refer (GET)]
             [liberator.dev :refer (wrap-trace)]
-            [raven-clj.interfaces :as sentry-interfaces]
             [raven-clj.ring :as sentry-mw]
             [oc.search.config :as c]
             [oc.lib.sentry-appender :as sentry]

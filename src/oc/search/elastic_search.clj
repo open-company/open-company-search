@@ -51,7 +51,7 @@
           request-exists? (esr/head conn (esr/index-url conn index))
           mapping (idx/get-mapping conn index)]
       (timbre/debug exists? request-exists? mapping)
-      (when (not exists?)
+      (when-not exists?
         (timbre/info "index does not exist...creating.")
         (slingshot/try+
          (timbre/info (create-index conn index {:mappings mapping-types :settings {}}))
@@ -67,7 +67,7 @@
   Create multi-value fields for authors
   "
   [attr authors]
-  (vec (distinct (map (fn [author] (attr author)) authors))))
+  (vec (distinct (map attr authors))))
 
 (defn- map-entry
   [data]
@@ -160,10 +160,6 @@
           new-search (vec (cons adding search-query))]
       (assoc-in query query-type new-search))
     query))
-
-(defn- add-filter
-  [query field value]
-  (add-to-query query [:bool :filter :bool :should] :term field value))
 
 (defn- add-should-match
   [query field value]
