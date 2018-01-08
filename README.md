@@ -79,6 +79,33 @@ For amazon see: http://docs.aws.amazon.com/elasticsearch-service/latest/develope
 
 Amazon will give you the endpoint after setup.
 
+#### Elastic Search local setup (Mac)
+
+Download ElasticSearch from https://www.elastic.co/downloads/elasticsearch. Unzip it and run
+
+```
+./bin/elasticsearch
+```
+
+You should be all set.
+
+If it happens that you start the elasticsearch on a low memory machine and you see messages of disk watermark exceeded (low, high or flood_stage) read the following instructions.
+With this procedure you will lose all your indexed data.
+Stop the ES instance, delete the data folder and restart elasticsearch with a config/elasticsearch.yml that looks like this:
+
+```
+cluster.name: local-es-instance
+cluster.routing.allocation.disk.watermark.low: 8gb
+cluster.routing.allocation.disk.watermark.high: 6gb
+cluster.routing.allocation.disk.watermark.flood_stage: 1gb
+
+network.host: localhost
+
+http.port: 9200
+```
+
+You can change the 3 values of disk watermark to make sure they fit your disk usage, these are pretty low and shouldn't be a problem though.
+
 #### Required Configuration & Secrets
 
 An [AWS SQS queue](https://aws.amazon.com/sqs/) is used to pass messages from other OpenCompany services to the search service. Setup an SQS Queue and key/secret/endpoint access to the queue using the AWS Web Console or API.
