@@ -24,7 +24,7 @@
     (timbre/info "[elastic-search] starting")
     (assoc component :search (es/start)))
 
-  (stop [{:keys [search] :as component}]
+  (stop [component]
     (timbre/info "elastic search stopped")
     (es/stop)
     (dissoc component :search)))

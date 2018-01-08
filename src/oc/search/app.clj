@@ -21,10 +21,11 @@
 (defn sqs-handler [msg done-channel]
   (let [msg-sns-body (json/parse-string (:body msg) true)
         msg-body (json/parse-string (:Message msg-sns-body) true)
-        msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))
-        error (if (:test-error msg-body) (/ 1 0) false)] ; test Sentry error reporting
+        msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))]
     (timbre/info "Received message from SQS.")
     (timbre/debug "\nMessage from SQS: " msg-body)
+    (when (:test-error msg-body)
+      (/ 1 0)) ; test Sentry error reporting
     (case msg-type
       "entry-index" (ocsearch/index-entry msg-body)
       "entry-delete" (ocsearch/delete-entry msg-body)
