@@ -1,9 +1,7 @@
 (ns oc.search.app
   (:gen-class)
   (:require [com.stuartsierra.component :as component]
-            [manifold.stream :as stream]
             [taoensso.timbre :as timbre]
-            [ring.middleware.json :refer (wrap-json-body)]
             [ring.middleware.keyword-params :refer (wrap-keyword-params)]
             [ring.middleware.params :refer (wrap-params)]
             [ring.middleware.reload :refer (wrap-reload)]
@@ -12,7 +10,6 @@
             [cheshire.core :as json]
             [compojure.core :as compojure :refer (GET)]
             [liberator.dev :refer (wrap-trace)]
-            [raven-clj.interfaces :as sentry-interfaces]
             [raven-clj.ring :as sentry-mw]
             [oc.search.config :as c]
             [oc.lib.sentry-appender :as sentry]
@@ -24,10 +21,11 @@
 (defn sqs-handler [msg done-channel]
   (let [msg-sns-body (json/parse-string (:body msg) true)
         msg-body (json/parse-string (:Message msg-sns-body) true)
-        msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))
-        error (if (:test-error msg-body) (/ 1 0) false)] ; test Sentry error reporting
+        msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))]
     (timbre/info "Received message from SQS.")
     (timbre/debug "\nMessage from SQS: " msg-body)
+    (when (:test-error msg-body)
+      (/ 1 0)) ; test Sentry error reporting
     (case msg-type
       "entry-index" (ocsearch/index-entry msg-body)
       "entry-delete" (ocsearch/delete-entry msg-body)
@@ -38,6 +36,7 @@
 
 
 ;; ----- Request Routing -----
+
 (defn routes [sys]
   (compojure/routes
     (GET "/ping" [] {:body "OpenCompany Search Service: OK" :status 200}) ; Up-time monitor
@@ -53,8 +52,9 @@
     "Elastic Search Index:" c/elastic-search-index "\n\n"
     (when c/intro? "Ready to serve...\n"))))
 
-;; Ring app definition
-(defn app [sys]
+(defn app
+  "Ring app definition"
+  [sys]
   (cond-> (routes sys)
     c/dsn             (sentry-mw/wrap-sentry c/dsn) ; important that this is first
     c/prod?           wrap-with-logger

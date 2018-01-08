@@ -24,11 +24,12 @@
     [jumblerg/ring.middleware.cors "1.0.1"] ; CORS library https://github.com/jumblerg/ring.middleware.cors
     [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
     [compojure "1.6.0"] ; Web routing https://github.com/weavejester/compojure
+    [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
     ;; Library for Elastic search http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
-    [clojurewerkz/elastisch "3.0.0-beta2" :exclusions [cheshire]]
+    [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.8"]
+    [open-company/lib "0.14.10"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -84,13 +85,13 @@
         ;; pretty-print the lein project map https://github.com/technomancy/leiningen/tree/master/lein-pprint
         [lein-pprint "1.2.0"]
         ;; Check for outdated dependencies https://github.com/xsc/lein-ancient
-        [lein-ancient "0.6.14"]
+        [lein-ancient "0.6.15"]
         ;; Catch spelling mistakes in docs and docstrings https://github.com/cldwalker/lein-spell
         [lein-spell "0.1.0"]
         ;; Dead code finder https://github.com/venantius/yagni
         [venantius/yagni "0.1.4" :exclusions [org.clojure/clojure]]
         ;; Autotest https://github.com/jakemcc/lein-test-refresh
-        [com.jakemccrary/lein-test-refresh "0.21.1"]
+        [com.jakemccrary/lein-test-refresh "0.22.0"]
       ]
     }]
              
@@ -143,7 +144,9 @@
     ;; Disable some linters that are enabled by default
     :exclude-linters [:constant-test :wrong-arity]
     ;; Enable some linters that are disabled by default
-    :add-linters [:unused-namespaces :unused-private-vars] ; :unused-locals]
+    :add-linters [:unused-namespaces :unused-private-vars :unused-locals]
+
+    :config-files ["third-party-macros.clj"]
 
     ;; Exclude testing namespaces
     :tests-paths ["test"]

@@ -3,9 +3,7 @@
             [taoensso.timbre :as timbre]
             [org.httpkit.server :as httpkit]
             [oc.lib.sqs :as sqs]
-            [oc.search.elastic-search :as es]
-            [oc.search.config :as c]))
-
+            [oc.search.elastic-search :as es]))
 
 (defrecord HttpKit [options handler]
   component/Lifecycle
@@ -26,7 +24,7 @@
     (timbre/info "[elastic-search] starting")
     (assoc component :search (es/start)))
 
-  (stop [{:keys [search] :as component}]
+  (stop [component]
     (timbre/info "elastic search stopped")
     (es/stop)
     (dissoc component :search)))

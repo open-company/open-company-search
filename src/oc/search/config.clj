@@ -18,7 +18,7 @@
 
 ;; ----- Sentry -----
 
-(defonce dsn (or (env :sentry-dsn) false))
+(defonce dsn (or (env :open-company-sentry-search) false))
 
 ;; ----- AWS -----
 

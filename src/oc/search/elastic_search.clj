@@ -51,7 +51,7 @@
           request-exists? (esr/head conn (esr/index-url conn index))
           mapping (idx/get-mapping conn index)]
       (timbre/debug exists? request-exists? mapping)
-      (when (not exists?)
+      (when-not exists?
         (timbre/info "index does not exist...creating.")
         (slingshot/try+
          (timbre/info (create-index conn index {:mappings mapping-types :settings {}}))
@@ -61,13 +61,14 @@
 
 (defn stop [])
 
-;; Indexing data
+;; ----- Indexing data -----
+
 (defn- map-authors
   "
   Create multi-value fields for authors
   "
   [attr authors]
-  (vec (distinct (map (fn [author] (attr author)) authors))))
+  (vec (distinct (map attr authors))))
 
 (defn- map-entry
   [data]
@@ -125,7 +126,8 @@
    (= "entry" (:resource-type data)) (map-entry data)
    (= "board" (:resource-type data)) (map-board data)))
 
-;; Upsert
+;; ----- Upsert -----
+
 (defn- add-index
   [data-type data]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
@@ -144,7 +146,8 @@
   [board-data]
   (add-index "board" board-data))
 
-;; Search
+;; ----- Search -----
+
 (defn- filter-by-team
   [teams]
   (q/bool {:filter (q/bool {:should (vec (map (fn [team]
@@ -160,10 +163,6 @@
           new-search (vec (cons adding search-query))]
       (assoc-in query query-type new-search))
     query))
-
-(defn- add-filter
-  [query field value]
-  (add-to-query query [:bool :filter :bool :should] :term field value))
 
 (defn- add-should-match
   [query field value]
@@ -188,7 +187,8 @@
                                       :min_score "0.001"
                                       })))
 
-;; Delete
+;; ----- Delete -----
+
 (defn- delete
   [data-type data]
   (let [uuid (:uuid (:old (:content data)))
