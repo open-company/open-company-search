@@ -53,7 +53,7 @@
           request-exists? (esr/head conn (esr/index-url conn index))
           mapping (idx/get-mapping conn index)]
       (timbre/debug exists? request-exists? mapping)
-      (when (not exists?)
+      (when-not exists?
         (timbre/info "index does not exist...creating.")
         (slingshot/try+
          (timbre/info (create-index conn index {:mappings mapping-types :settings {}}))
@@ -63,13 +63,12 @@
 
 (defn stop [])
 
-;; Indexing data
+;; ----- Indexing data -----
+
 (defn- multi-value
-  "
-  Create multi-value fields
-  "
+  "Create multi-value fields"
   [attr values]
-  (vec (distinct (map (fn [value] (attr value)) values))))
+  (vec (distinct (map attr values))))
 
 (defn- map-entry
   [data]
@@ -129,7 +128,8 @@
    (= "entry" (:resource-type data)) (map-entry data)
    (= "board" (:resource-type data)) (map-board data)))
 
-;; Upsert
+;; ----- Upsert -----
+
 (defn- add-index
   [data-type data]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
@@ -148,7 +148,8 @@
   [board-data]
   (add-index "board" board-data))
 
-;; Search
+;; ----- Search -----
+
 (defn- filter-by-team
   [teams]
   {:bool
@@ -206,7 +207,8 @@
                                       :min_score "0.001"
                                       })))
 
-;; Delete
+;; ----- Delete -----
+
 (defn- delete
   [data-type data]
   (let [uuid (:uuid (:old (:content data)))
