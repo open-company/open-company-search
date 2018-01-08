@@ -13,12 +13,10 @@
   (timbre/debug "received entry to delete.")
   (es/delete-entry data))
 
-
 (defn index-board
   [board-data]
   (timbre/debug "received board to index.")
   (es/add-board-index board-data))
-
 
 (defn delete-board
   [board-data]

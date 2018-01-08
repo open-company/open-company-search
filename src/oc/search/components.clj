@@ -3,9 +3,7 @@
             [taoensso.timbre :as timbre]
             [org.httpkit.server :as httpkit]
             [oc.lib.sqs :as sqs]
-            [oc.search.elastic-search :as es]
-            [oc.search.config :as c]))
-
+            [oc.search.elastic-search :as es]))
 
 (defrecord HttpKit [options handler]
   component/Lifecycle
