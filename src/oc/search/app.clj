@@ -31,7 +31,7 @@
       "entry-delete" (ocsearch/delete-entry msg-body)
       "board-index" (ocsearch/index-board msg-body)
       "board-delete" (ocsearch/delete-board msg-body)
-      (timbre/error "Unrecognized message type" msg-body)))
+      (timbre/info "Unrecognized message type" msg-body)))
   (sqs/ack done-channel msg))
 
 
