@@ -5,7 +5,6 @@
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
-             [clojurewerkz.elastisch.query :as q]
              [oc.search.config :as c]))
 
 
