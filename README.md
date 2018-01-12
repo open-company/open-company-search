@@ -82,7 +82,7 @@ AWS provides the endpoint you need during the setup process.
 
 #### Elasticsearch local setup (Mac)
 
-Download Elasticsearch from https://www.elastic.co/downloads/elasticsearch. Unzip it and run
+Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/elasticsearch). Unzip it and run it:
 
 ```
 ./bin/elasticsearch
@@ -90,9 +90,11 @@ Download Elasticsearch from https://www.elastic.co/downloads/elasticsearch. Unzi
 
 You should be all set.
 
-If it happens that you start the elasticsearch on a low memory machine and you see messages of disk watermark exceeded (low, high or flood_stage) read the following instructions.
-With this procedure you will lose all your indexed data.
-Stop the ES instance, delete the data folder and restart elasticsearch with a config/elasticsearch.yml that looks like this:
+NB: If it happens that you start the Elasticsearch on machine with low diskspace, and you see messages about disk watermark exceeded (low, high or flood_stage) read, you are left with a read-only index (Elasticsearch tries to prevent itself from filling up the remaining disk space). 
+
+For this case only, you can follow these instructions to adjust the disk watermark that Elasticsearch uses:
+
+With this procedure you will lose all your previously indexed Elasticsearch data. Stop the Elasticsearch instance, delete the data folder and restart Elasticsearch with a `./config/elasticsearch.yml` that looks like this:
 
 ```
 cluster.name: local-es-instance
@@ -105,7 +107,7 @@ network.host: localhost
 http.port: 9200
 ```
 
-You can change the 3 values of disk watermark to make sure they fit your disk usage, these are pretty low and shouldn't be a problem though.
+You can change the 3 values of disk watermark to make sure they fit your disk space.
 
 #### Required Configuration & Secrets
 
@@ -129,9 +131,9 @@ You can also override these settings with environmental variables in the form of
 
 You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the aws console and follow these instruction:
 
-Go to https://console.aws.amazon.com/sqs/ and chose the search queue configured above. There will be a tab below called Permissions. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
+Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and chose the search queue configured above. There will be a tab below called 'Permissions'. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
 
-Next to go https://console.aws.amazon.com/sns/ and click Topics. Choose the storage topic you want to subscribe to. Next click 'Add Subscription'. In the dialog select SQS and paste in the ARN for the queue you used above.
+Next to go the [AWS SNS Console](https://console.aws.amazon.com/sns/) and click 'Topics'. Choose the storage topic you want to subscribe to. Next click 'Add Subscription'. In the dialog select 'SQS' and paste in the ARN for the queue you used above.
 
 ## Usage
 
@@ -186,4 +188,4 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
-Copyright © 2016-2017 OpenCompany, LLC.
+Copyright © 2017-2018 OpenCompany, LLC.
