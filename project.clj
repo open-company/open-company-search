@@ -28,8 +28,9 @@
     ;; Library for Elastic search http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
     [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
+    
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.10"]
+    [open-company/lib "0.14.15"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
