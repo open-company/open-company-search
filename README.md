@@ -30,7 +30,7 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 ## Overview
 
-The OpenCompany Search Service handles searching of data in the OpenCompany system. The service uses Elastic Search (v6.0) for indexing and searching data.
+The OpenCompany Search Service handles full-text searching of content in the OpenCompany system. The service uses Elasticsearch for indexing and searching data.
 
 
 ## Local Setup
@@ -40,7 +40,8 @@ Prospective users of [Carrot](https://carrot.io/) should get started by going to
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8+ JRE is needed to run Clojure
-* [Leiningen](https://github.com/technomancy/leiningen) 2.5.1+ - Clojure's build and dependency management tool
+* [Leiningen](https://github.com/technomancy/leiningen) 2.7.1+ - Clojure's build and dependency management tool
+* [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) 6.0+ - Full-text search engine
 
 #### Java
 
@@ -69,19 +70,19 @@ cd open-company-search
 lein deps
 ```
 
-#### Elastic Search
+#### Elasticsearch
 
-This code is used with Elastic Search 6.0. The service uses the Elastic Search, REST API and only supports IP based access control.  The Elastic Search endpoint and index name are the two configuration options needed.
+This code is used with Elasticsearch 6.0+. The service uses the Elasticsearch's REST API, and only supports IP based access control. The Elasticsearch endpoint and index name are the two configuration options needed.
 
-For local setup see: https://www.elastic.co/downloads/elasticsearch and use http://localhost:9200 as your endpoint.
+For local setup see: [Elasticsearch Download and Installation Steps](https://www.elastic.co/downloads/elasticsearch) and use `http://localhost:9200` as your endpoint.
 
-For amazon see: http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html
+To use the AWS Elasticsearch Service see: [Getting Started with Amazon Easticsearch Service](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/)
 
-Amazon will give you the endpoint after setup.
+AWS provides the endpoint you need during the setup process.
 
-#### Elastic Search local setup (Mac)
+#### Elasticsearch local setup (Mac)
 
-Download ElasticSearch from https://www.elastic.co/downloads/elasticsearch. Unzip it and run
+Download Elasticsearch from https://www.elastic.co/downloads/elasticsearch. Unzip it and run
 
 ```
 ./bin/elasticsearch

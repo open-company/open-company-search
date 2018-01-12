@@ -1,5 +1,5 @@
 (ns oc.search.api
-  "API to search data in elastic search."
+  "API to search data in Elasticsearch."
   (:require [compojure.core :as compojure :refer (GET)]
             [taoensso.timbre :as timbre]
             [cheshire.core :as json]

@@ -48,8 +48,8 @@
   (println (str "\n"
     "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
     "Sentry: " c/dsn "\n"
-    "Elastic Search Endpoint: " c/elastic-search-endpoint "\n"
-    "Elastic Search Index:" c/elastic-search-index "\n\n"
+    "Elasticsearch Endpoint: " c/elastic-search-endpoint "\n"
+    "Elasticsearch Index:" c/elastic-search-index "\n\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn app

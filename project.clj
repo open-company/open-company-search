@@ -1,5 +1,5 @@
 (defproject open-company-search "0.1.0-SNAPSHOT"
-  :description "Search service. A REST API to query open company data. Uses elastic search to index and search data."
+  :description "A REST API to search Open Company content. Uses Elasticsearch."
   :url "http://github.com/open-company/open-company-search"
   :license {
     :name "Mozilla Public License v2.0"
@@ -25,7 +25,7 @@
     [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
     [compojure "1.6.0"] ; Web routing https://github.com/weavejester/compojure
     [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
-    ;; Library for Elastic search http://clojureelasticsearch.info/
+    ;; Library for Elasticsearch http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
     [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
     
