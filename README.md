@@ -82,7 +82,7 @@ AWS provides the endpoint you need during the setup process.
 
 #### Elasticsearch local setup (Mac)
 
-Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/elasticsearch). Unzip it and run it:
+Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/elasticsearch). Unzip it, move it to the place you want to keep it, and run it:
 
 ```
 ./bin/elasticsearch
@@ -94,7 +94,7 @@ NB: If it happens that you start the Elasticsearch on machine with low diskspace
 
 For this case only, you can follow these instructions to adjust the disk watermark that Elasticsearch uses:
 
-With this procedure you will lose all your previously indexed Elasticsearch data. Stop the Elasticsearch instance, delete the data folder and restart Elasticsearch with a `./config/elasticsearch.yml` that looks like this:
+With this procedure you will lose all your previously indexed Elasticsearch data. Stop the Elasticsearch instance, delete the data directory and restart Elasticsearch with a `./config/elasticsearch.yml` that looks like this:
 
 ```
 cluster.name: local-es-instance
@@ -120,16 +120,18 @@ Make sure you update the section in `project.clj` that looks like this to contai
   :env ^:replace {
     :aws-access-key-id "CHANGE-ME"
     :aws-secret-access-key "CHANGE-ME"
-    :endpoint "us-east-1"
+    :aws-endpoint "us-east-1"
     :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
-    :elastic-search-endpoint 'https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN'
+    :elastic-search-endpoint "http://localhost:9200" ; "https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN"
     :elastic-search-index "CHANGE-ME"
+    :intro "true"
+    :log-level "debug"
 }
 ```
 
 You can also override these settings with environmental variables in the form of `AWS_ACCESS_KEY_ID`, etc. Use environmental variables to provide production secrets when running in production.
 
-You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the aws console and follow these instruction:
+You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the AWS console and follow these instruction:
 
 Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and chose the search queue configured above. There will be a tab below called 'Permissions'. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
 

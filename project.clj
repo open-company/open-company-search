@@ -70,6 +70,8 @@
         :aws-secret-access-key "CHANGE-ME"
         :aws-endpoint "us-east-1"
         :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
+        :elastic-search-endpoint "http://localhost:9200" ; "https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN"
+        :elastic-search-index "CHANGE-ME"
         :intro "true"
         :log-level "debug"
       }
@@ -125,7 +127,8 @@
 
   :repl-options {
     :welcome (println (str "\n" (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"
-                      "OpenCompany Search Service REPL\n"))
+                      "OpenCompany Search Service REPL\n"
+                      "\nReady to do your bidding... I suggest (go) or (go <port>) as your first command.\n"))
     :init-ns dev
   }
   
@@ -155,4 +158,4 @@
   }
 
   :main oc.search.app
-  )
+)
