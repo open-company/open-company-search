@@ -118,6 +118,7 @@ Make sure you update the section in `project.clj` that looks like this to contai
 ```clojure
 :dev [:qa {
   :env ^:replace {
+    :open-company-auth-passphrase "this_is_a_dev_secret" ; JWT secret
     :aws-access-key-id "CHANGE-ME"
     :aws-secret-access-key "CHANGE-ME"
     :aws-endpoint "us-east-1"

@@ -32,7 +32,7 @@
   ([port]
      (init port)
      (start)
-     (app/echo-config)
+     (app/echo-config port)
      (println (str "Now serving search requests from the REPL.\n"
                    "When you're ready to stop the system, just type: (stop)\n"))
      port))

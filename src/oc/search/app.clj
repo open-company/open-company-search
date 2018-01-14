@@ -44,12 +44,15 @@
     (GET "/---500-test---" [] {:body "Testing bad things." :status 500})
     (search-api/routes sys)))
 
-(defn echo-config []
+(defn echo-config [port]
   (println (str "\n"
-    "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
-    "Sentry: " c/dsn "\n"
+    "Running on port: " port "\n"
     "Elasticsearch endpoint: " c/elastic-search-endpoint "\n"
-    "Elasticsearch index:" c/elastic-search-index "\n\n"
+    "Elasticsearch index:" c/elastic-search-index "\n"
+    "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
+    "Hot-reload: " c/hot-reload "\n"
+    "Trace: " c/liberator-trace "\n"
+    "Sentry: " c/dsn "\n\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn app
@@ -94,7 +97,7 @@
   (println (str "\n"
     (when c/intro? (str (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"))
     "OpenCompany Search Service\n"))
-  (echo-config))
+  (echo-config port))
 
 (defn -main []
   (start c/search-server-port))
