@@ -170,6 +170,16 @@
                           {:term {:viewer-id.keyword uuid}}]}}]
     (assoc-in query query-type (vec (cons adding filter-query)))))
 
+(defn- filter-drafts [query uuid]
+  (let [query-type [:bool :filter :bool :must]
+        filter-query (get-in query query-type)
+        adding {:bool
+                {:should [{:bool
+                           {:must {:term {:status "published"}}}
+                           },
+                          {:term {:author-id.keyword uuid}}]}}]
+    (assoc-in query query-type (vec (cons adding filter-query)))))
+
 (defn- add-to-query
   [query query-type search-term field value]
   (if value
@@ -191,6 +201,7 @@
         teams (:teams params)
         query (-> (filter-by-team teams)
                   (filter-private (:uuid params))
+                  (filter-drafts (:uuid params))
                   (add-to-query [:bool :filter :bool :must]
                                 :term :type.keyword "entry")
                   (add-to-query [:bool :filter :bool :must]
