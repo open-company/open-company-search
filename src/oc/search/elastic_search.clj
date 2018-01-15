@@ -5,7 +5,6 @@
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
-             [clojurewerkz.elastisch.query :as q]
              [oc.search.config :as c]))
 
 
@@ -18,10 +17,12 @@
                       :board-uuid    {:type "text" :fields {:keyword {:type "keyword"}}}
                       :board-name    {:type "text"}
                       :board-slug    {:type "text"}
+                      :access        {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :viewer-id     {:type "text" :fields {:keyword {:type "keyword"}}}
                       :headline      {:type "text" :analyzer "snowball"}
                       :author-url    {:type "text" }
                       :author-name   {:type "text" }
-                      :author-id     {:type "text"}
+                      :author-id     {:type "text" :fields {:keyword {:type "keyword"}}}
                       :secure-uuid   {:type "text" :fields {:keyword {:type "keyword"}}}
                       :uuid          {:type "text" :fields {:keyword {:type "keyword"}}}
                       :status        {:type "text" :fields {:keyword {:type "keyword"}}}
@@ -63,12 +64,10 @@
 
 ;; ----- Indexing data -----
 
-(defn- map-authors
-  "
-  Create multi-value fields for authors
-  "
-  [attr authors]
-  (vec (distinct (map attr authors))))
+(defn- multi-value
+  "Create multi-value fields"
+  [attr values]
+  (vec (distinct (map attr values))))
 
 (defn- map-entry
   [data]
@@ -86,9 +85,11 @@
      :board-uuid (:uuid board)
      :board-name (:name board)
      :board-slug (:slug board)
-     :author-id (map-authors :user-id (:author entry))
-     :author-name (map-authors :name (:author entry))
-     :author-url (map-authors :avatar-url (:author entry))
+     :access (:access board)
+     :viewer-id (multi-value :user-id (:viewers entry))
+     :author-id (multi-value :user-id (:author entry))
+     :author-name (multi-value :name (:author entry))
+     :author-url (multi-value :avatar-url (:author entry))
      :headline (:headline entry)
      :secure-uuid (:secure-uuid entry)
      :uuid (str "entry-" (:uuid entry))
@@ -150,10 +151,34 @@
 
 (defn- filter-by-team
   [teams]
-  (q/bool {:filter (q/bool {:should (vec (map (fn [team]
-                                                {:term
-                                                 {:org-team-id.keyword team}})
-                                              teams))})}))
+  {:bool
+   {:filter
+    {:bool
+     {:must [{:bool
+              {:should (vec (map (fn [team] {:term
+                                             {:org-team-id.keyword team}})
+                                 teams))}}]}}}})
+
+(defn- filter-private [query uuid]
+  (let [query-type [:bool :filter :bool :must]
+        filter-query (get-in query query-type)
+        adding {:bool
+                {:should [{:bool
+                           {:must_not {:term {:access "private"}}}
+                           },
+                          {:term {:author-id.keyword uuid}}
+                          {:term {:viewer-id.keyword uuid}}]}}]
+    (assoc-in query query-type (vec (cons adding filter-query)))))
+
+(defn- filter-drafts [query uuid]
+  (let [query-type [:bool :filter :bool :must]
+        filter-query (get-in query query-type)
+        adding {:bool
+                {:should [{:bool
+                           {:must {:term {:status "published"}}}
+                           },
+                          {:term {:author-id.keyword uuid}}]}}]
+    (assoc-in query query-type (vec (cons adding filter-query)))))
 
 (defn- add-to-query
   [query query-type search-term field value]
@@ -169,13 +194,18 @@
   (add-to-query query [:bool :should] :match field value))
 
 (defn search
-  [teams query-params]
+  [query-params]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
         params (keywordize-keys query-params)
+        teams (:teams params)
         query (-> (filter-by-team teams)
-                  (add-to-query [:bool :filter :bool :must] :term :type.keyword "entry")
-                  (add-to-query [:bool :filter :bool :must] :term  :org-uuid.keyword (:org params))
+                  (filter-private (:uuid params))
+                  (filter-drafts (:uuid params))
+                  (add-to-query [:bool :filter :bool :must]
+                                :term :type.keyword "entry")
+                  (add-to-query [:bool :filter :bool :must]
+                                :term :org-uuid.keyword (:org params))
                   (add-should-match :body (:q params))
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
