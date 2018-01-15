@@ -8,6 +8,7 @@
              [clojurewerkz.elastisch.query :as q]
              [oc.search.config :as c]))
 
+;; ----- Index -----
 
 (defonce mapping-types
   ;; https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
@@ -43,6 +44,8 @@
              {:body (if mappings
                       {:settings settings :mappings mappings}
                       {:settings settings})})))
+
+;; ----- Elasticsearch Component -----
 
 (defn start []
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})

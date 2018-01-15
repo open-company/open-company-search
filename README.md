@@ -134,9 +134,7 @@ You can also override these settings with environmental variables in the form of
 
 You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the AWS console and follow these instruction:
 
-Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and chose the search queue configured above. There will be a tab below called 'Permissions'. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
-
-Next to go the [AWS SNS Console](https://console.aws.amazon.com/sns/) and click 'Topics'. Choose the storage topic you want to subscribe to. Next click 'Add Subscription'. In the dialog select 'SQS' and paste in the ARN for the queue you used above.
+Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' dropdown, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
 
 ## Usage
 
