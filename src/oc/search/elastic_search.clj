@@ -10,6 +10,8 @@
 
 
 (defonce mapping-types
+  ;; https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  ;; https://www.elastic.co/guide/en/elasticsearch/reference/2.4/analysis-snowball-analyzer.html
   {:doc {:properties {:type          {:type "text" :fields {:keyword {:type "keyword"}}}
                       :org-slug      {:type "text" :store true :index false}
                       :org-name      {:type "text" :store true :index false}
