@@ -1,6 +1,6 @@
 (ns oc.search.api
   "API to search data in Elasticsearch."
-  (:require [compojure.core :as compojure :refer (GET)]
+  (:require [compojure.core :as compojure :refer (OPTIONS GET)]
             [taoensso.timbre :as timbre]
             [cheshire.core :as json]
             [liberator.core :refer (defresource by-method)]
@@ -12,6 +12,7 @@
 
 (defn- handle-search
   [params ctx]
+  (timbre/debug "Searching...")
   (let [teams (:teams (:user ctx))
         result (esearch/search teams params)]
     (timbre/debug "Search Result:" result)
@@ -38,20 +39,17 @@
   :allowed? true
 
   ;; Validations
-  :processable? (by-method {
-    :options true
-    :get true})
+  :processable? true
 
   ;; Responses
-  :handle-ok (fn [ctx]
-               (timbre/debug "Searching")
-               (handle-search params ctx))
+  :handle-ok (fn [ctx] (handle-search params ctx))
   :handle-no-content (fn [ctx] (when-not (:existing? ctx) (api-common/missing-response))))
 
 ;; ----- Routes -----
 
 (defn routes [sys]
   (compojure/routes
-   ;; Comment listing and creation
-   (GET "/search/" {params :query-params}
-        (search params))))
+   (OPTIONS "/search/" {params :query-params} (search params))
+   (OPTIONS "/search" {params :query-params} (search params))
+   (GET "/search/" {params :query-params} (search params))
+   (GET "/search" {params :query-params} (search params))))

@@ -180,7 +180,7 @@
         params (keywordize-keys query-params)
         query (-> (filter-by-team teams)
                   (add-to-query [:bool :filter :bool :must] :term :type.keyword "entry")
-                  (add-to-query [:bool :filter :bool :must] :term  :org-uuid.keyword (:org params))
+                  (add-to-query [:bool :filter :bool :must] :term :org-uuid.keyword (:org params))
                   (add-should-match :body (:q params))
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
@@ -188,8 +188,7 @@
                   (add-should-match :slug (:q params)))]
     (timbre/debug "Executing Query:" query)
     (doc/search-all-types conn index {:query query
-                                      :min_score "0.001"
-                                      })))
+                                      :min_score "0.001"})))
 
 ;; ----- Delete -----
 
