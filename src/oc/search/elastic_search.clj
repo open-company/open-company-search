@@ -79,9 +79,9 @@
   (let [entry (:new (:content data))
         org (:org data)
         board (:board data)]
-    (timbre/debug org)
-    (timbre/debug board)
-    (timbre/debug entry)
+    (timbre/debug "Org:" org)
+    (timbre/debug "Board:" board)
+    (timbre/debug "Entry:" entry)
     {:type "entry"
      :org-slug (:slug org)
      :org-name (:name org)
@@ -109,8 +109,8 @@
   [data]
   (let [org (:org data)
         board (:new (:content data))]
-    (timbre/debug org)
-    (timbre/debug board)
+    (timbre/debug "Org:" org)
+    (timbre/debug "Board:" board)
     {:type "board"
      :org-slug (:slug org)
      :org-name (:name org)
