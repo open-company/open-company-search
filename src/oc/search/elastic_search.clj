@@ -185,9 +185,8 @@
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
                   (add-should-match :name (:q params))
-                  (add-should-match :slug (:q params))
-                  )]
-    (timbre/info query)
+                  (add-should-match :slug (:q params)))]
+    (timbre/debug "Executing Query:" query)
     (doc/search-all-types conn index {:query query
                                       :min_score "0.001"
                                       })))

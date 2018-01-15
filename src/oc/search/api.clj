@@ -10,18 +10,16 @@
 
 (defonce search-media-type "application/vnd.open-company.search.v1+json")
 
-(defn start [])
-
-(defn stop [])
-
 (defn- handle-search
   [params ctx]
   (let [teams (:teams (:user ctx))
         result (esearch/search teams params)]
-    (timbre/debug result)
+    (timbre/debug "Search Result:" result)
     (json/generate-string
      (:hits result)
      {:pretty config/pretty?})))
+
+;; ----- Resources - see: http://clojure-liberator.github.io/liberator/assets/img/decision-graph.svg
 
 (defresource search [params]
   (api-common/open-company-authenticated-resource config/passphrase) ; verify validity and presence of required JWToken
