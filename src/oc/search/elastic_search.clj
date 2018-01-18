@@ -22,7 +22,7 @@
                       :board-slug    {:type "text"}
                       :access        {:type "text" :fields {:keyword {:type "keyword"}}}
                       :viewer-id     {:type "text" :fields {:keyword {:type "keyword"}}}
-                      :headline      {:type "text" :analyzer "snowball"}
+                      :headline      {:type "text" :analyzer "snowball" :term_vector "with_positions_offsets" }
                       :author-url    {:type "text" }
                       :author-name   {:type "text" }
                       :author-id     {:type "text" :fields {:keyword {:type "keyword"}}}
