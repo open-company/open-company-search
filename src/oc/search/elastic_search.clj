@@ -231,4 +231,19 @@
 
 (defn delete-entry [data] (delete "entry" data))
 
-(defn delete-board [data] (delete "board" data))
+(defn- delete-board-entries
+  [data]
+  (let [uuid (:uuid (:old (:content data)))
+        conn (esr/connect c/elastic-search-endpoint {:content-type :json})
+        index (str c/elastic-search-index)]
+    (timbre/info (esr/post conn
+                   (esr/url-with-path
+                     conn
+                     index
+                     "_delete_by_query")
+                   {:body {:query {:match {:board-uuid uuid}}}}))))
+
+(defn delete-board
+  [data]
+  (delete-board-entries data)
+  (delete "board" data))
