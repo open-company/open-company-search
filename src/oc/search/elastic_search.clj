@@ -148,8 +148,28 @@
   [entry-data]
   (add-index "entry" entry-data))
 
+(defn- handle-private-public-board-change
+  [board-data]
+  (let [board (:new (:content board-data))
+        uuid (:uuid board)
+        conn (esr/connect c/elastic-search-endpoint {:content-type :json})
+        index (str c/elastic-search-index)]
+    (timbre/info (esr/post conn
+                           (esr/url-with-path
+                             conn
+                             index
+                             "doc"
+                             "_update_by_query")
+                           {:body
+                            {:conflicts "proceed"
+                             :query {:match {:board-uuid uuid}}
+                             :script {:inline "ctx._source[params.field] = params.value;"
+                                      :params {:field "access" :value (:access board)}}
+                             }}))))
+
 (defn add-board-index
   [board-data]
+  (handle-private-public-board-change board-data)
   (add-index "board" board-data))
 
 ;; ----- Search -----
