@@ -238,6 +238,7 @@
                   (add-should-match :slug (:q params)))]
     (timbre/debug "Executing Query:" query)
     (doc/search-all-types conn index {:query query
+                                      :size 20
                                       :min_score "0.001"})))
 
 ;; ----- Delete -----
