@@ -149,6 +149,13 @@
   (add-index "entry" entry-data))
 
 (defn- handle-private-public-board-change
+  "
+  Partial update for entries when board information changes. Elastic search
+  supports two methods of partial update a document merge and update by script.
+  This uses the script method and updates each entry based on the given query.
+
+  https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html
+  "
   [board-data]
   (let [board (:new (:content board-data))
         uuid (:uuid board)
@@ -219,6 +226,13 @@
   (add-to-query query [:bool :should] :match field value))
 
 (defn search
+  "
+   Return search results based on the given query. Filter out results the
+   current user shouldn't see.
+
+   Doesn't support paging as of yet. This will return 20 results maximum
+   which can be increased if we think we need more or until we support paging.
+  "
   [query-params]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
