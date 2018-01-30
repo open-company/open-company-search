@@ -1,6 +1,6 @@
 (ns oc.search.api
-  "API to search data in elastic search."
-  (:require [compojure.core :as compojure :refer (GET)]
+  "API to search data in Elasticsearch."
+  (:require [compojure.core :as compojure :refer (OPTIONS GET)]
             [taoensso.timbre :as timbre]
             [cheshire.core :as json]
             [liberator.core :refer (defresource by-method)]
@@ -10,19 +10,18 @@
 
 (defonce search-media-type "application/vnd.open-company.search.v1+json")
 
-(defn start [])
-
-(defn stop [])
-
 (defn- handle-search
   [params ctx]
+  (timbre/debug "Searching...")
   (let [params_teams (assoc params :teams (:teams (:user ctx)))
         params_user (assoc params_teams :uuid (:user-id (:user ctx)))
         result (esearch/search params_user)]
-    (timbre/debug result)
+    (timbre/debug "Search Result:" result)
     (json/generate-string
      (:hits result)
      {:pretty config/pretty?})))
+
+;; ----- Resources - see: http://clojure-liberator.github.io/liberator/assets/img/decision-graph.svg
 
 (defresource search [params]
   (api-common/open-company-authenticated-resource config/passphrase) ; verify validity and presence of required JWToken
@@ -41,20 +40,17 @@
   :allowed? true
 
   ;; Validations
-  :processable? (by-method {
-    :options true
-    :get true})
+  :processable? true
 
   ;; Responses
-  :handle-ok (fn [ctx]
-               (timbre/debug "Searching")
-               (handle-search params ctx))
+  :handle-ok (fn [ctx] (handle-search params ctx))
   :handle-no-content (fn [ctx] (when-not (:existing? ctx) (api-common/missing-response))))
 
 ;; ----- Routes -----
 
 (defn routes [sys]
   (compojure/routes
-   ;; Comment listing and creation
-   (GET "/search/" {params :query-params}
-        (search params))))
+   (OPTIONS "/search/" {params :query-params} (search params))
+   (OPTIONS "/search" {params :query-params} (search params))
+   (GET "/search/" {params :query-params} (search params))
+   (GET "/search" {params :query-params} (search params))))

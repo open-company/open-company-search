@@ -7,8 +7,11 @@
              [clojurewerkz.elastisch.rest.document :as doc]
              [oc.search.config :as c]))
 
+;; ----- Index -----
 
 (defonce mapping-types
+  ;; https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
+  ;; https://www.elastic.co/guide/en/elasticsearch/reference/2.4/analysis-snowball-analyzer.html
   {:doc {:properties {:type          {:type "text" :fields {:keyword {:type "keyword"}}}
                       :org-slug      {:type "text" :store true :index false}
                       :org-name      {:type "text" :store true :index false}
@@ -19,7 +22,7 @@
                       :board-slug    {:type "text"}
                       :access        {:type "text" :fields {:keyword {:type "keyword"}}}
                       :viewer-id     {:type "text" :fields {:keyword {:type "keyword"}}}
-                      :headline      {:type "text" :analyzer "snowball"}
+                      :headline      {:type "text" :analyzer "snowball" :term_vector "with_positions_offsets" }
                       :author-url    {:type "text" }
                       :author-name   {:type "text" }
                       :author-id     {:type "text" :fields {:keyword {:type "keyword"}}}
@@ -42,6 +45,8 @@
              {:body (if mappings
                       {:settings settings :mappings mappings}
                       {:settings settings})})))
+
+;; ----- Elasticsearch Component -----
 
 (defn start []
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
@@ -74,9 +79,9 @@
   (let [entry (:new (:content data))
         org (:org data)
         board (:board data)]
-    (timbre/debug org)
-    (timbre/debug board)
-    (timbre/debug entry)
+    (timbre/debug "Org:" org)
+    (timbre/debug "Board:" board)
+    (timbre/debug "Entry:" entry)
     {:type "entry"
      :org-slug (:slug org)
      :org-name (:name org)
@@ -104,8 +109,8 @@
   [data]
   (let [org (:org data)
         board (:new (:content data))]
-    (timbre/debug org)
-    (timbre/debug board)
+    (timbre/debug "Org:" org)
+    (timbre/debug "Board:" board)
     {:type "board"
      :org-slug (:slug org)
      :org-name (:name org)
@@ -143,8 +148,35 @@
   [entry-data]
   (add-index "entry" entry-data))
 
+(defn- handle-private-public-board-change
+  "
+  Partial update for entries when board information changes. Elastic search
+  supports two methods of partial update a document merge and update by script.
+  This uses the script method and updates each entry based on the given query.
+
+  https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html
+  "
+  [board-data]
+  (let [board (:new (:content board-data))
+        uuid (:uuid board)
+        conn (esr/connect c/elastic-search-endpoint {:content-type :json})
+        index (str c/elastic-search-index)]
+    (timbre/info (esr/post conn
+                           (esr/url-with-path
+                             conn
+                             index
+                             "doc"
+                             "_update_by_query")
+                           {:body
+                            {:conflicts "proceed"
+                             :query {:match {:board-uuid uuid}}
+                             :script {:inline "ctx._source[params.field] = params.value;"
+                                      :params {:field "access" :value (:access board)}}
+                             }}))))
+
 (defn add-board-index
   [board-data]
+  (handle-private-public-board-change board-data)
   (add-index "board" board-data))
 
 ;; ----- Search -----
@@ -194,6 +226,13 @@
   (add-to-query query [:bool :should] :match field value))
 
 (defn search
+  "
+   Return search results based on the given query. Filter out results the
+   current user shouldn't see.
+
+   Doesn't support paging as of yet. This will return 20 results maximum
+   which can be increased if we think we need more or until we support paging.
+  "
   [query-params]
   (let [conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
@@ -210,12 +249,11 @@
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
                   (add-should-match :name (:q params))
-                  (add-should-match :slug (:q params))
-                  )]
-    (timbre/info query)
+                  (add-should-match :slug (:q params)))]
+    (timbre/debug "Executing Query:" query)
     (doc/search-all-types conn index {:query query
-                                      :min_score "0.001"
-                                      })))
+                                      :size 20
+                                      :min_score "0.001"})))
 
 ;; ----- Delete -----
 
@@ -228,4 +266,19 @@
 
 (defn delete-entry [data] (delete "entry" data))
 
-(defn delete-board [data] (delete "board" data))
+(defn- delete-board-entries
+  [data]
+  (let [uuid (:uuid (:old (:content data)))
+        conn (esr/connect c/elastic-search-endpoint {:content-type :json})
+        index (str c/elastic-search-index)]
+    (timbre/info (esr/post conn
+                   (esr/url-with-path
+                     conn
+                     index
+                     "_delete_by_query")
+                   {:body {:query {:match {:board-uuid uuid}}}}))))
+
+(defn delete-board
+  [data]
+  (delete-board-entries data)
+  (delete "board" data))

@@ -30,7 +30,7 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 ## Overview
 
-The OpenCompany Search Service handles searching of data in the OpenCompany system. The service uses Elastic Search (v6.0) for indexing and searching data.
+The OpenCompany Search Service handles full-text searching of content in the OpenCompany system. The service uses Elasticsearch for indexing and searching data.
 
 
 ## Local Setup
@@ -40,7 +40,8 @@ Prospective users of [Carrot](https://carrot.io/) should get started by going to
 Most of the dependencies are internal, meaning [Leiningen](https://github.com/technomancy/leiningen) will handle getting them for you. There are a few exceptions:
 
 * [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8+ JRE is needed to run Clojure
-* [Leiningen](https://github.com/technomancy/leiningen) 2.5.1+ - Clojure's build and dependency management tool
+* [Leiningen](https://github.com/technomancy/leiningen) 2.7.1+ - Clojure's build and dependency management tool
+* [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) 6.0+ - Full-text search engine
 
 #### Java
 
@@ -69,19 +70,19 @@ cd open-company-search
 lein deps
 ```
 
-#### Elastic Search
+#### Elasticsearch
 
-This code is used with Elastic Search 6.0. The service uses the Elastic Search, REST API and only supports IP based access control.  The Elastic Search endpoint and index name are the two configuration options needed.
+This code is used with Elasticsearch 6.0+. The service uses the Elasticsearch's REST API, and only supports IP based access control. The Elasticsearch endpoint and index name are the two configuration options needed.
 
-For local setup see: https://www.elastic.co/downloads/elasticsearch and use http://localhost:9200 as your endpoint.
+For local setup see: [Elasticsearch Download and Installation Steps](https://www.elastic.co/downloads/elasticsearch) and use `http://localhost:9200` as your endpoint.
 
-For amazon see: http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html
+To use the AWS Elasticsearch Service see: [Getting Started with Amazon Easticsearch Service](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/)
 
-Amazon will give you the endpoint after setup.
+AWS provides the endpoint you need during the setup process.
 
-#### Elastic Search local setup (Mac)
+#### Elasticsearch local setup (Mac)
 
-Download ElasticSearch from https://www.elastic.co/downloads/elasticsearch. Unzip it and run
+Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/elasticsearch). Unzip it, move it to the place you want to keep it, and run it:
 
 ```
 ./bin/elasticsearch
@@ -89,9 +90,11 @@ Download ElasticSearch from https://www.elastic.co/downloads/elasticsearch. Unzi
 
 You should be all set.
 
-If it happens that you start the elasticsearch on a low memory machine and you see messages of disk watermark exceeded (low, high or flood_stage) read the following instructions.
-With this procedure you will lose all your indexed data.
-Stop the ES instance, delete the data folder and restart elasticsearch with a config/elasticsearch.yml that looks like this:
+NB: If it happens that you start the Elasticsearch on machine with low diskspace, and you see messages about disk watermark exceeded (low, high or flood_stage) read, you are left with a read-only index (Elasticsearch tries to prevent itself from filling up the remaining disk space). 
+
+For this case only, you can follow these instructions to adjust the disk watermark that Elasticsearch uses:
+
+With this procedure you will lose all your previously indexed Elasticsearch data. Stop the Elasticsearch instance, delete the data directory and restart Elasticsearch with a `./config/elasticsearch.yml` that looks like this:
 
 ```
 cluster.name: local-es-instance
@@ -104,7 +107,7 @@ network.host: localhost
 http.port: 9200
 ```
 
-You can change the 3 values of disk watermark to make sure they fit your disk usage, these are pretty low and shouldn't be a problem though.
+You can change the 3 values of disk watermark to make sure they fit your disk space.
 
 #### Required Configuration & Secrets
 
@@ -115,22 +118,23 @@ Make sure you update the section in `project.clj` that looks like this to contai
 ```clojure
 :dev [:qa {
   :env ^:replace {
+    :open-company-auth-passphrase "this_is_a_dev_secret" ; JWT secret
     :aws-access-key-id "CHANGE-ME"
     :aws-secret-access-key "CHANGE-ME"
-    :endpoint "us-east-1"
+    :aws-endpoint "us-east-1"
     :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
-    :elastic-search-endpoint 'https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN'
+    :elastic-search-endpoint "http://localhost:9200" ; "https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN"
     :elastic-search-index "CHANGE-ME"
+    :intro "true"
+    :log-level "debug"
 }
 ```
 
 You can also override these settings with environmental variables in the form of `AWS_ACCESS_KEY_ID`, etc. Use environmental variables to provide production secrets when running in production.
 
-You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the aws console and follow these instruction:
+You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the AWS console and follow these instruction:
 
-Go to https://console.aws.amazon.com/sqs/ and chose the search queue configured above. There will be a tab below called Permissions. After selecting that tab click the 'Add Permission' button. In the dialog have the effect be Allow, access is Everybody (*), and the single permission is `SendMessage`.
-
-Next to go https://console.aws.amazon.com/sns/ and click Topics. Choose the storage topic you want to subscribe to. Next click 'Add Subscription'. In the dialog select SQS and paste in the ARN for the queue you used above.
+Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' dropdown, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
 
 ## Usage
 
@@ -185,4 +189,4 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [Mozilla Public License v2.0](http://www.mozilla.org/MPL/2.0/).
 
-Copyright © 2016-2017 OpenCompany, LLC.
+Copyright © 2017-2018 OpenCompany, LLC.

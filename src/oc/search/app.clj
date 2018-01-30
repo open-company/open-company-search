@@ -19,11 +19,11 @@
             [oc.search.api :as search-api]))
 
 (defn sqs-handler [msg done-channel]
-  (let [msg-sns-body (json/parse-string (:body msg) true)
-        msg-body (json/parse-string (:Message msg-sns-body) true)
+  (let [msg-sqs-body (json/parse-string (:body msg) true)
+        msg-body (json/parse-string (:Message msg-sqs-body) true)
         msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))]
     (timbre/info "Received message from SQS.")
-    (timbre/debug "\nMessage from SQS: " msg-body)
+    (timbre/debug "Message from SQS:" msg-body)
     (when (:test-error msg-body)
       (/ 1 0)) ; test Sentry error reporting
     (case msg-type
@@ -34,7 +34,6 @@
       (timbre/info "Unrecognized message type" msg-body)))
   (sqs/ack done-channel msg))
 
-
 ;; ----- Request Routing -----
 
 (defn routes [sys]
@@ -44,12 +43,15 @@
     (GET "/---500-test---" [] {:body "Testing bad things." :status 500})
     (search-api/routes sys)))
 
-(defn echo-config []
+(defn echo-config [port]
   (println (str "\n"
+    "Running on port: " port "\n"
+    "Elasticsearch endpoint: " c/elastic-search-endpoint "\n"
+    "Elasticsearch index:" c/elastic-search-index "\n"
     "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
-    "Sentry: " c/dsn "\n"
-    "Elastic Search Endpoint: " c/elastic-search-endpoint "\n"
-    "Elastic Search Index:" c/elastic-search-index "\n\n"
+    "Hot-reload: " c/hot-reload "\n"
+    "Trace: " c/liberator-trace "\n"
+    "Sentry: " c/dsn "\n\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn app
@@ -94,7 +96,7 @@
   (println (str "\n"
     (when c/intro? (str (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"))
     "OpenCompany Search Service\n"))
-  (echo-config))
+  (echo-config port))
 
 (defn -main []
   (start c/search-server-port))

@@ -18,14 +18,14 @@
         (dissoc component :http-kit))
       component)))
 
-(defrecord ElasticSearch [options handler]
+(defrecord Elasticsearch [options handler]
   component/Lifecycle
   (start [component]
-    (timbre/info "[elastic-search] starting")
+    (timbre/info "[elastic-search] starting Elasticsearch...")
     (assoc component :search (es/start)))
 
   (stop [component]
-    (timbre/info "elastic search stopped")
+    (timbre/info "[elastic-search] stopping Elasticsearch...")
     (es/stop)
     (dissoc component :search)))
 
@@ -39,7 +39,7 @@
 
 (defn search-system [{:keys [port handler-fn sqs-consumer]}]
   (component/system-map
-   :elastic-search (component/using (map->ElasticSearch {}) [])
+   :elastic-search (component/using (map->Elasticsearch {}) [])
    :sqs-consumer (sqs/sqs-listener sqs-consumer)
    :handler (component/using
              (map->Handler {:handler-fn handler-fn})

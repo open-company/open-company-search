@@ -1,5 +1,5 @@
 (defproject open-company-search "0.1.0-SNAPSHOT"
-  :description "Search service. A REST API to query open company data. Uses elastic search to index and search data."
+  :description "A REST API to search Open Company content. Uses Elasticsearch."
   :url "http://github.com/open-company/open-company-search"
   :license {
     :name "Mozilla Public License v2.0"
@@ -25,11 +25,12 @@
     [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
     [compojure "1.6.0"] ; Web routing https://github.com/weavejester/compojure
     [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
-    ;; Library for Elastic search http://clojureelasticsearch.info/
+    ;; Library for Elasticsearch http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
     [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
+
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.14.10"]
+    [open-company/lib "0.14.15"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -65,10 +66,15 @@
     ;; Dev environment and dependencies
     :dev [:qa {
       :env ^:replace {
+        :liberator-trace "true" ; liberator debug data in HTTP response headers
+        :hot-reload "true" ; reload code when changed on the file system
+        :open-company-auth-passphrase "this_is_a_dev_secret" ; JWT secret
         :aws-access-key-id "CHANGE-ME"
         :aws-secret-access-key "CHANGE-ME"
         :aws-endpoint "us-east-1"
         :aws-sqs-search-index-queue "https://sqs.REGION.amazonaws.com/CHANGE/ME"
+        :elastic-search-endpoint "http://localhost:9200" ; "https://ESDOMAIN.us-east-1.es.amazonaws.com/ESDOMAIN"
+        :elastic-search-index "CHANGE-ME"
         :intro "true"
         :log-level "debug"
       }
@@ -124,7 +130,8 @@
 
   :repl-options {
     :welcome (println (str "\n" (slurp (clojure.java.io/resource "oc/assets/ascii_art.txt")) "\n"
-                      "OpenCompany Search Service REPL\n"))
+                      "OpenCompany Search Service REPL\n"
+                      "\nReady to do your bidding... I suggest (go) or (go <port>) as your first command.\n"))
     :init-ns dev
   }
   
@@ -154,4 +161,4 @@
   }
 
   :main oc.search.app
-  )
+)

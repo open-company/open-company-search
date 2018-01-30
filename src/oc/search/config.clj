@@ -32,7 +32,8 @@
 
 (defonce aws-sqs-search-index-queue (env :aws-sqs-search-index-queue))
 
-;; ----- Elastic Search -----
+;; ----- Elasticsearch -----
+
 (defonce elastic-search-endpoint (env :elastic-search-endpoint))
 (defonce elastic-search-index (env :elastic-search-index))
 
