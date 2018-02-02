@@ -2,6 +2,7 @@
    (:require [taoensso.timbre :as timbre]
              [slingshot.slingshot :as slingshot]
              [clojure.walk :refer (keywordize-keys)]
+             [cheshire.core :as json]
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
@@ -92,8 +93,8 @@
      :board-name (:name board)
      :board-slug (:slug board)
      :access (:access board)
-     :board-author-id (:authors board)
-     :viewer-id (:viewers board)
+     :board-author-id (distinct (:authors board))
+     :viewer-id (distinct (:viewers board))
      :author-id (multi-value :user-id (:author entry))
      :author-name (multi-value :name (:author entry))
      :author-url (multi-value :avatar-url (:author entry))
@@ -154,7 +155,7 @@
 (defn- handle-board-change
   "
   Partial update for entries when board information changes. Elastic search
-  supports two methods of partial update a document merge and update by script.
+  supports two methods of partial update, a document merge and update by script.
   This uses the script method and updates each entry based on the given query.
 
   https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html
@@ -164,10 +165,16 @@
         uuid (:uuid board)
         conn (esr/connect c/elastic-search-endpoint {:content-type :json})
         index (str c/elastic-search-index)
-        fields ([{:access (:access board)}
-                 {:viewer-id (:viewers board)}
-                 {:board-author-id (:authors board)])
-        script (map (fn[i] ) fields)]
+        fields [["board-slug" (:slug board)]
+                ["board-name" (:name board)]
+                ["access" (:access board)]
+                ["viewer-id" (:viewers board)]
+                ["board-author-id" (:authors board)]]
+        script (apply str
+                      (map (fn [[key value]]
+                             (str "ctx._source['" key "'] = "
+                                  (json/generate-string value) ";\n"))
+                           fields))]
     (timbre/info (esr/post conn
                            (esr/url-with-path
                              conn
@@ -177,7 +184,7 @@
                            {:body
                             {:conflicts "proceed"
                              :query {:match {:board-uuid uuid}}
-                             :script {:inline script}
+                             :script {:inline (str script)}
                              }}))))
 
 (defn add-board-index
