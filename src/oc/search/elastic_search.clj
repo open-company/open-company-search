@@ -170,7 +170,7 @@
                 ["access" (:access board)]
                 ["viewer-id" (:viewers board)]
                 ["board-author-id" (:authors board)]]
-        script (apply str
+        script (clojure.string/join
                       (map (fn [[key value]]
                              (str "ctx._source['" key "'] = "
                                   (json/generate-string value) ";\n"))
