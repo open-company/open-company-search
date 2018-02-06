@@ -166,6 +166,15 @@ To create a production build run:
 lein build
 ```
 
+## Reindexing
+
+To remove the current search index:
+
+```
+curl -i -X DELETE http://localhost:9200/<INDEX-NAME>
+```
+
+To reindex, see the [steps in the README](https://github.com/open-company/open-company-storage#force-initial-indexing-or-re-indexing) of the Search Service.
 
 ## Testing
 
