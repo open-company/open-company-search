@@ -2,6 +2,7 @@
    (:require [taoensso.timbre :as timbre]
              [slingshot.slingshot :as slingshot]
              [clojure.walk :refer (keywordize-keys)]
+             [cheshire.core :as json]
              [clojurewerkz.elastisch.rest :as esr]
              [clojurewerkz.elastisch.rest.index :as idx]
              [clojurewerkz.elastisch.rest.document :as doc]
@@ -22,6 +23,7 @@
                       :board-slug    {:type "text"}
                       :access        {:type "text" :fields {:keyword {:type "keyword"}}}
                       :viewer-id     {:type "text" :fields {:keyword {:type "keyword"}}}
+                      :board-author-id {:type "text" :fields {:keyword {:type "keyword"}}}
                       :headline      {:type "text" :analyzer "snowball" :term_vector "with_positions_offsets" }
                       :author-url    {:type "text" }
                       :author-name   {:type "text" }
@@ -91,7 +93,8 @@
      :board-name (:name board)
      :board-slug (:slug board)
      :access (:access board)
-     :viewer-id (multi-value :user-id (:viewers entry))
+     :board-author-id (distinct (:authors board))
+     :viewer-id (distinct (:viewers board))
      :author-id (multi-value :user-id (:author entry))
      :author-name (multi-value :name (:author entry))
      :author-url (multi-value :avatar-url (:author entry))
@@ -148,10 +151,11 @@
   [entry-data]
   (add-index "entry" entry-data))
 
-(defn- handle-private-public-board-change
+
+(defn- handle-board-change
   "
   Partial update for entries when board information changes. Elastic search
-  supports two methods of partial update a document merge and update by script.
+  supports two methods of partial update, a document merge and update by script.
   This uses the script method and updates each entry based on the given query.
 
   https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update-by-query.html
@@ -160,7 +164,17 @@
   (let [board (:new (:content board-data))
         uuid (:uuid board)
         conn (esr/connect c/elastic-search-endpoint {:content-type :json})
-        index (str c/elastic-search-index)]
+        index (str c/elastic-search-index)
+        fields [["board-slug" (:slug board)]
+                ["board-name" (:name board)]
+                ["access" (:access board)]
+                ["viewer-id" (:viewers board)]
+                ["board-author-id" (:authors board)]]
+        script (clojure.string/join
+                      (map (fn [[key value]]
+                             (str "ctx._source['" key "'] = "
+                                  (json/generate-string value) ";\n"))
+                           fields))]
     (timbre/info (esr/post conn
                            (esr/url-with-path
                              conn
@@ -170,13 +184,12 @@
                            {:body
                             {:conflicts "proceed"
                              :query {:match {:board-uuid uuid}}
-                             :script {:inline "ctx._source[params.field] = params.value;"
-                                      :params {:field "access" :value (:access board)}}
+                             :script {:inline (str script)}
                              }}))))
 
 (defn add-board-index
   [board-data]
-  (handle-private-public-board-change board-data)
+  (handle-board-change board-data)
   (add-index "board" board-data))
 
 ;; ----- Search -----
@@ -198,7 +211,7 @@
                 {:should [{:bool
                            {:must_not {:term {:access "private"}}}
                            },
-                          {:term {:author-id.keyword uuid}}
+                          {:term {:board-author-id.keyword uuid}}
                           {:term {:viewer-id.keyword uuid}}]}}]
     (assoc-in query query-type (vec (cons adding filter-query)))))
 
