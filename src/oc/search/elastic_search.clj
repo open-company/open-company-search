@@ -106,7 +106,7 @@
      :published-at (:published-at entry)
      :shared-at (:shared-at (last (:shared entry)))
      :created-at (:created-at entry)
-     :body (:body entry)}))
+     :body (str (:video-transcript entry) (:body entry))}))
 
 (defn- map-board
   [data]
