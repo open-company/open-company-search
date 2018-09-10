@@ -66,7 +66,7 @@ lein deps
 
 #### Elasticsearch
 
-This code is used with Elasticsearch 6.0+. The service uses the Elasticsearch's REST API, and only supports IP based access control. The Elasticsearch endpoint and index name are the two configuration options needed.
+This code is used with Elasticsearch 6.x+. The service uses the Elasticsearch's REST API, and only supports IP based access control. The Elasticsearch endpoint and index name are the two configuration options needed.
 
 For local setup see: [Elasticsearch Download and Installation Steps](https://www.elastic.co/downloads/elasticsearch) and use `http://localhost:9200` as your endpoint.
 
@@ -92,8 +92,8 @@ With this procedure you will lose all your previously indexed Elasticsearch data
 
 ```
 cluster.name: local-es-instance
-cluster.routing.allocation.disk.watermark.low: 8gb
-cluster.routing.allocation.disk.watermark.high: 6gb
+cluster.routing.allocation.disk.watermark.low: 4gb
+cluster.routing.allocation.disk.watermark.high: 2gb
 cluster.routing.allocation.disk.watermark.flood_stage: 1gb
 
 network.host: localhost
