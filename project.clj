@@ -2,8 +2,8 @@
   :description "A REST API to search Open Company content. Uses Elasticsearch."
   :url "http://github.com/open-company/open-company-search"
   :license {
-    :name "Mozilla Public License v2.0"
-    :url "http://www.mozilla.org/MPL/2.0/"
+    :name "GNU Affero General Public License Version 3"
+    :url "https://www.gnu.org/licenses/agpl-3.0.en.html"
   }
 
   :min-lein-version "2.7.1"
@@ -12,18 +12,18 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.9.0"]
+    [org.clojure/clojure "1.10.0-alpha7"]
     ;; Async programming tools https://github.com/ztellman/manifold
-    [manifold "0.1.7-alpha6"]
+    [manifold "0.1.8"]
     ;; Namespace management https://github.com/clojure/tools.namespace
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
     [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]
-    [ring/ring-devel "1.6.3"] ; Web application library https://github.com/ring-clojure/ring
-    [ring/ring-core "1.6.3"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-devel "1.7.0"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-core "1.7.0"] ; Web application library https://github.com/ring-clojure/ring
     [ring/ring-json "0.5.0-beta1"] ; JSON request/response https://github.com/ring-clojure/ring-json
     [jumblerg/ring.middleware.cors "1.0.1"] ; CORS library https://github.com/jumblerg/ring.middleware.cors
     [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
-    [compojure "1.6.0"] ; Web routing https://github.com/weavejester/compojure
+    [compojure "1.6.1"] ; Web routing https://github.com/weavejester/compojure
     [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
     ;; Library for Elasticsearch http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
@@ -57,7 +57,7 @@
       }
       :plugins [
         ;; Linter https://github.com/jonase/eastwood
-        [jonase/eastwood "0.2.6-beta2"]
+        [jonase/eastwood "0.2.9"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
         [lein-kibit "0.1.6" :exclusions [org.clojure/clojure]]
       ]
@@ -85,7 +85,7 @@
       :plugins [
         ;; Check for code smells https://github.com/dakrone/lein-bikeshed
         ;; NB: org.clojure/tools.cli is pulled in by lein-kibit
-        [lein-bikeshed "0.5.0" :exclusions [org.clojure/tools.cli]]
+        [lein-bikeshed "0.5.1" :exclusions [org.clojure/tools.cli]]
         ;; Runs bikeshed, kibit and eastwood https://github.com/itang/lein-checkall
         [lein-checkall "0.1.1"]
         ;; pretty-print the lein project map https://github.com/technomancy/leiningen/tree/master/lein-pprint
@@ -95,9 +95,9 @@
         ;; Catch spelling mistakes in docs and docstrings https://github.com/cldwalker/lein-spell
         [lein-spell "0.1.0"]
         ;; Dead code finder https://github.com/venantius/yagni
-        [venantius/yagni "0.1.4" :exclusions [org.clojure/clojure]]
+        [venantius/yagni "0.1.6" :exclusions [org.clojure/clojure]]
         ;; Autotest https://github.com/jakemcc/lein-test-refresh
-        [com.jakemccrary/lein-test-refresh "0.22.0"]
+        [com.jakemccrary/lein-test-refresh "0.23.0"]
       ]
     }]
              
