@@ -84,7 +84,7 @@ Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/dow
 
 You should be all set.
 
-NB: If it happens that you start the Elasticsearch on machine with low diskspace, and you see messages about disk watermark exceeded (low, high or flood_stage) read, you are left with a read-only index (Elasticsearch tries to prevent itself from filling up the remaining disk space). 
+NB: If it happens that you start the Elasticsearch on machine with low disk space, and you see messages about disk watermark exceeded (low, high or flood_stage) read, you are left with a read-only index (Elasticsearch tries to prevent itself from filling up the remaining disk space). 
 
 For this case only, you can follow these instructions to adjust the disk watermark that Elasticsearch uses:
 
@@ -128,7 +128,7 @@ You can also override these settings with environmental variables in the form of
 
 You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the AWS console and follow these instruction:
 
-Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' dropdown, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
+Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' drop-down, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
 
 ## Usage
 
@@ -192,7 +192,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [GNU Affero General Public License Version 3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
-Copyright © 2017-2018 OpenCompany, LLC.
+Copyright © 2017-2019 OpenCompany, LLC.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

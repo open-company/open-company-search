@@ -12,14 +12,14 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.10.0-alpha7"]
+    [org.clojure/clojure "1.10.0"]
     ;; Async programming tools https://github.com/ztellman/manifold
-    [manifold "0.1.8"]
+    [manifold "0.1.9-alpha3"]
     ;; Namespace management https://github.com/clojure/tools.namespace
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
     [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]
-    [ring/ring-devel "1.7.0"] ; Web application library https://github.com/ring-clojure/ring
-    [ring/ring-core "1.7.0"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-devel "1.7.1"] ; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-core "1.7.1"] ; Web application library https://github.com/ring-clojure/ring
     [ring/ring-json "0.5.0-beta1"] ; JSON request/response https://github.com/ring-clojure/ring-json
     [jumblerg/ring.middleware.cors "1.0.1"] ; CORS library https://github.com/jumblerg/ring.middleware.cors
     [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
@@ -30,7 +30,7 @@
     [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.16.32alpha"]
+    [open-company/lib "0.16.32"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -57,7 +57,7 @@
       }
       :plugins [
         ;; Linter https://github.com/jonase/eastwood
-        [jonase/eastwood "0.2.9"]
+        [jonase/eastwood "0.3.4"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
         [lein-kibit "0.1.6" :exclusions [org.clojure/clojure]]
       ]
@@ -95,7 +95,7 @@
         ;; Catch spelling mistakes in docs and docstrings https://github.com/cldwalker/lein-spell
         [lein-spell "0.1.0"]
         ;; Dead code finder https://github.com/venantius/yagni
-        [venantius/yagni "0.1.6" :exclusions [org.clojure/clojure]]
+        [venantius/yagni "0.1.7" :exclusions [org.clojure/clojure]]
         ;; Autotest https://github.com/jakemcc/lein-test-refresh
         [com.jakemccrary/lein-test-refresh "0.23.0"]
       ]
