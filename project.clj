@@ -12,7 +12,7 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.10.0"]
+    [org.clojure/clojure "1.10.1-beta3"]
     ;; Async programming tools https://github.com/ztellman/manifold
     [manifold "0.1.9-alpha3"]
     ;; Namespace management https://github.com/clojure/tools.namespace
@@ -27,10 +27,10 @@
     [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
     ;; Library for Elasticsearch http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
-    [clojurewerkz/elastisch "3.0.0" :exclusions [cheshire]]
+    [clojurewerkz/elastisch "3.0.1" :exclusions [cheshire]]
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.16.33"]
+    [open-company/lib "0.17.8"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -57,7 +57,7 @@
       }
       :plugins [
         ;; Linter https://github.com/jonase/eastwood
-        [jonase/eastwood "0.3.4"]
+        [jonase/eastwood "0.3.5"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
         [lein-kibit "0.1.6" :exclusions [org.clojure/clojure]]
       ]
@@ -85,7 +85,7 @@
       :plugins [
         ;; Check for code smells https://github.com/dakrone/lein-bikeshed
         ;; NB: org.clojure/tools.cli is pulled in by lein-kibit
-        [lein-bikeshed "0.5.1" :exclusions [org.clojure/tools.cli]]
+        [lein-bikeshed "0.5.2" :exclusions [org.clojure/tools.cli]]
         ;; Runs bikeshed, kibit and eastwood https://github.com/itang/lein-checkall
         [lein-checkall "0.1.1"]
         ;; pretty-print the lein project map https://github.com/technomancy/leiningen/tree/master/lein-pprint
@@ -97,7 +97,7 @@
         ;; Dead code finder https://github.com/venantius/yagni
         [venantius/yagni "0.1.7" :exclusions [org.clojure/clojure]]
         ;; Autotest https://github.com/jakemcc/lein-test-refresh
-        [com.jakemccrary/lein-test-refresh "0.23.0"]
+        [com.jakemccrary/lein-test-refresh "0.24.1"]
       ]
     }]
              
