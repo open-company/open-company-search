@@ -38,6 +38,8 @@
                       :shared-at     {:type "date"}
                       :created-at    {:type "date"}
                       :body          {:type "text" :analyzer "snowball"
+                                      :term_vector "with_positions_offsets"}
+                      :abstract      {:type "text" :analyzer "snowball"
                                       :term_vector "with_positions_offsets"}}}})
 
 (defn- create-index
@@ -106,7 +108,8 @@
      :published-at (:published-at entry)
      :shared-at (:shared-at (last (:shared entry)))
      :created-at (:created-at entry)
-     :body (str (:video-transcript entry) (:body entry))}))
+     :body (str (:video-transcript entry) (:body entry))
+     :abstract (:abstract entry)}))
 
 (defn- map-board
   [data]
@@ -262,7 +265,8 @@
                   (add-should-match :headline (:q params))
                   (add-should-match :author-name (:q params))
                   (add-should-match :name (:q params))
-                  (add-should-match :slug (:q params)))]
+                  (add-should-match :slug (:q params))
+                  (add-should-match :abstract (:q params)))]
     (timbre/debug "Executing Query:" query)
     (doc/search-all-types conn index {:query query
                                       :size 20
