@@ -6,13 +6,13 @@
     :url "https://www.gnu.org/licenses/agpl-3.0.en.html"
   }
 
-  :min-lein-version "2.7.1"
+  :min-lein-version "2.9.1"
 
   ;; JVM memory
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.10.1-beta3"]
+    [org.clojure/clojure "1.10.1-RC1"]
     ;; Async programming tools https://github.com/ztellman/manifold
     [manifold "0.1.9-alpha3"]
     ;; Namespace management https://github.com/clojure/tools.namespace
@@ -30,7 +30,7 @@
     [clojurewerkz/elastisch "3.0.1" :exclusions [cheshire]]
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.8"]
+    [open-company/lib "0.17.11"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
