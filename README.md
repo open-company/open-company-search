@@ -35,7 +35,7 @@ Most of the dependencies are internal, meaning [Leiningen](https://github.com/te
 
 * [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) - a Java 8+ JRE is needed to run Clojure
 * [Leiningen](https://github.com/technomancy/leiningen) 2.9.1+ - Clojure's build and dependency management tool
-* [Elasticsearch](https://www.elastic.co/downloads/elasticsearch) 6.0+ - Full-text search engine
+* [Elasticsearch 6](https://www.elastic.co/downloads/past-releases#elasticsearch) 6.8.5+ - Full-text search engine
 
 #### Java
 
@@ -82,7 +82,7 @@ AWS provides the endpoint you need during the setup process.
 
 #### Elasticsearch local setup (Mac)
 
-Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/elasticsearch). Unzip it, move it to the place you want to keep it, and run it:
+Download Elasticsearch from [Elasticsearch Downloads](https://www.elastic.co/downloads/past-releases#elasticsearch). Unzip it, move it to the place you want to keep it, and run it:
 
 ```
 ./bin/elasticsearch

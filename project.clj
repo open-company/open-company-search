@@ -12,25 +12,35 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx3072m" "-server"]
 
   :dependencies [
-    [org.clojure/clojure "1.10.1-RC1"]
+    [org.clojure/clojure "1.10.1"]
     ;; Async programming tools https://github.com/ztellman/manifold
-    [manifold "0.1.9-alpha3"]
+    [manifold "0.1.9-alpha3" :exclusions [org.clojure/tools.logging]]
     ;; Namespace management https://github.com/clojure/tools.namespace
     ;; NB: org.clojure/tools.reader is pulled in by oc.lib
-    [org.clojure/tools.namespace "0.3.0-alpha4" :exclusions [org.clojure/tools.reader]]
-    [ring/ring-devel "1.7.1"] ; Web application library https://github.com/ring-clojure/ring
-    [ring/ring-core "1.7.1"] ; Web application library https://github.com/ring-clojure/ring
-    [ring/ring-json "0.5.0-beta1"] ; JSON request/response https://github.com/ring-clojure/ring-json
-    [jumblerg/ring.middleware.cors "1.0.1"] ; CORS library https://github.com/jumblerg/ring.middleware.cors
-    [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore]] ; Ring logging https://github.com/nberger/ring-logger-timbre
-    [compojure "1.6.1"] ; Web routing https://github.com/weavejester/compojure
-    [slingshot "0.12.2"] ; Enhanced try/catch https://github.com/scgilardi/slingshot
+    [org.clojure/tools.namespace "0.3.1" :exclusions [org.clojure/tools.reader]]
+    ;; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-devel "1.8.0"]
+    ;; Web application library https://github.com/ring-clojure/ring
+    [ring/ring-core "1.8.0"]
+    ;; JSON request/response https://github.com/ring-clojure/ring-json
+    [ring/ring-json "0.5.0" :exclusions [joda-time com.fasterxml.jackson.core/jackson-core]]
+    ;; CORS library https://github.com/jumblerg/ring.middleware.cors
+    [jumblerg/ring.middleware.cors "1.0.1"]
+    ;; Ring logging https://github.com/nberger/ring-logger-timbre
+    [ring-logger-timbre "0.7.6" :exclusions [com.taoensso/encore org.clojure/tools.logging]]
+    ;; Web routing https://github.com/weavejester/compojure
+    [compojure "1.6.1"]
+    ;; Enhanced try/catch https://github.com/scgilardi/slingshot
+    [slingshot "0.12.2"]
     ;; Library for Elasticsearch http://clojureelasticsearch.info/
     ;; NB: cheshire is provided by oc.lib
-    [clojurewerkz/elastisch "3.0.1" :exclusions [cheshire]]
-
+    [clojurewerkz/elastisch "3.0.1" :exclusions [joda-time cheshire clj-http com.google.guava/guava]]
+    ;; XML parsers, dependency of ring-json and oc/lib https://github.com/FasterXML/jackson-core
+    ;; NB: not used directly
+    [com.fasterxml.jackson.core/jackson-core "2.10.1"]
+    
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.11"]
+    [open-company/lib "0.17.24"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -57,9 +67,9 @@
       }
       :plugins [
         ;; Linter https://github.com/jonase/eastwood
-        [jonase/eastwood "0.3.5"]
+        [jonase/eastwood "0.3.6"]
         ;; Static code search for non-idiomatic code https://github.com/jonase/kibit
-        [lein-kibit "0.1.6" :exclusions [org.clojure/clojure]]
+        [lein-kibit "0.1.8" :exclusions [org.clojure/clojure]]
       ]
     }
 
@@ -80,7 +90,7 @@
       }
 
       :dependencies [
-        [hickory "0.7.1"] ; HTML as data https://github.com/davidsantiago/hickory
+        [hickory "0.7.1" :exclusions [org.clojure/clojurescript]] ; HTML as data https://github.com/davidsantiago/hickory
       ]
       :plugins [
         ;; Check for code smells https://github.com/dakrone/lein-bikeshed
