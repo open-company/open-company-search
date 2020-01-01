@@ -7,9 +7,9 @@
 
 ## Background
 
-> There is not a crime, there is not a dodge, there is not a trick, there is not a swindle, there is not a vice which does not live by secrecy.
+> We live in a culture of secrecy, where hiding and lying are accepted as natural, even though we don’t like it. We want honesty, transparency, and authenticity in our loved ones, our groups and organizations, and in our own self so we can reach the heights of our capacity. By clinging to the opaque reality we stall our evolution.
 
-> -- Joseph Pulitzer
+> -- Penney Peirce
 
 Teams struggle to keep everyone on the same page. People are hyper-connected in the moment with chat and email, but it gets noisy as teams grow, and people miss key information. Everyone needs clear and consistent leadership, and the solution is surprisingly simple and effective - **great leadership updates that build transparency and alignment**.
 
