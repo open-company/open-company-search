@@ -26,50 +26,6 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 The OpenCompany Search Service handles full-text searching of content in the OpenCompany system. The service uses Elasticsearch for indexing and searching data.
 
-```
-┌───────────────┐ ┌─────────────────────┐
-│               │ │                     │
-│ OC Web Client │ │   Storage Service   │
-│               │ │                     │
-└───────────────┘ └─────────────────────┘
-        │                    │           
-        │                    │           
-        │                  HTTP          
-        │                    │           
-        │                    ▼           
-       HTTP       ┌─────────────────────┐
-        │         │SQS                  │
-        │         │                     │
-        │         │   oc-search-index   │
-        │         │                     │
-        │         └─────────────────────┘
-        │                    ▲           
-        │                    │           
-        │                  HTTP          
-        ▼                    │           
- ┌─────────────────────────────────────┐ 
- │                                     │ 
- │                                     │ 
- │                                     │ 
- │          Search Service             │ 
- │                                     │ 
- │                                     │ 
- │                                     │ 
- └─────────────────────────────────────┘ 
-                    │                    
-                    │                    
-                  HTTP                   
-                    │                    
-                    ▼                    
- ┌─────────────────────────────────────┐ 
- │                                     │ 
- │                                     │ 
- │            ElasticSearch            │ 
- │                                     │ 
- │                                     │ 
- │                                     │ 
- └─────────────────────────────────────┘ 
-```
 
 ## Local Setup
 
@@ -179,6 +135,55 @@ You can also override these settings with environmental variables in the form of
 You will also need to subscribe the SQS queue to the storage SNS topic. To do this you will need to go to the AWS console and follow these instruction:
 
 Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' drop-down, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
+
+
+## Technical Design
+
+```
+┌───────────────┐ ┌─────────────────────┐
+│               │ │                     │
+│ OC Web Client │ │   Storage Service   │
+│               │ │                     │
+└───────────────┘ └─────────────────────┘
+        │                    │           
+        │                    │           
+        │                  HTTP          
+        │                    │           
+        │                    ▼           
+       HTTP       ┌─────────────────────┐
+        │         │SQS                  │
+        │         │                     │
+        │         │   oc-search-index   │
+        │         │                     │
+        │         └─────────────────────┘
+        │                    ▲           
+        │                    │           
+        │                  HTTP          
+        ▼                    │           
+ ┌─────────────────────────────────────┐ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ │          Search Service             │ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ └─────────────────────────────────────┘ 
+                    │                    
+                    │                    
+                  HTTP                   
+                    │                    
+                    ▼                    
+ ┌─────────────────────────────────────┐ 
+ │                                     │ 
+ │                                     │ 
+ │            ElasticSearch            │ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ └─────────────────────────────────────┘ 
+```
+
 
 ## Usage
 
