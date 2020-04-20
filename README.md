@@ -26,6 +26,50 @@ To get started, head to: [Carrot](https://carrot.io/)
 
 The OpenCompany Search Service handles full-text searching of content in the OpenCompany system. The service uses Elasticsearch for indexing and searching data.
 
+```
+┌───────────────┐ ┌─────────────────────┐
+│               │ │                     │
+│ OC Web Client │ │   Storage Service   │
+│               │ │                     │
+└───────────────┘ └─────────────────────┘
+        │                    │           
+        │                    │           
+        │                  HTTP          
+        │                    │           
+        │                    ▼           
+       HTTP       ┌─────────────────────┐
+        │         │SQS                  │
+        │         │                     │
+        │         │   oc-search-index   │
+        │         │                     │
+        │         └─────────────────────┘
+        │                    ▲           
+        │                    │           
+        │                  HTTP          
+        ▼                    │           
+ ┌─────────────────────────────────────┐ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ │          Search Service             │ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ └─────────────────────────────────────┘ 
+                    │                    
+                    │                    
+                  HTTP                   
+                    │                    
+                    ▼                    
+ ┌─────────────────────────────────────┐ 
+ │                                     │ 
+ │                                     │ 
+ │            ElasticSearch            │ 
+ │                                     │ 
+ │                                     │ 
+ │                                     │ 
+ └─────────────────────────────────────┘ 
+```
 
 ## Local Setup
 
