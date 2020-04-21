@@ -155,13 +155,13 @@ Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the 
        │       Requests      ┌─────────────────────┐
        │           │         │SNS Topic            │
        │           │         │                     │
-       │           │         │      oc-storage     │
+      HTTP         │         │      oc-storage     │
        │           │         │                     │
-       │           │         └─────────────────────┘
-       │           │              ▲                 
+     Search        │         └─────────────────────┘
+    requests       │              ▲                 
        │           │              │                 
        │           ▼          subscribe             
-      HTTP       ┌────────────────┴────┐            
+       │         ┌────────────────┴────┐            
        │         │SQS                  │            
        │         │                     │            
        │         │   oc-search-index   │            
@@ -191,7 +191,7 @@ Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the 
 │            ElasticSearch            │             
 │                                     │             
 │                                     │             
-└─────────────────────────────────────┘                    
+└─────────────────────────────────────┘                               
 ```
 
 
