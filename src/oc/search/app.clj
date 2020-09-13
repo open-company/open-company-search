@@ -19,6 +19,8 @@
             [oc.search.api :as search-api]))
 
 (defn sqs-handler [msg done-channel]
+  (println "DBG sqs-handler" done-channel)
+  (clojure.pprint/pprint msg)
   (doseq [msg-sqs-body (sqs/read-message-body (:body msg))]
     (let [msg-body (json/parse-string (:Message msg-sqs-body) true)
           msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))]
@@ -58,7 +60,9 @@
   "Ring app definition"
   [sys]
   (cond-> (routes sys)
-    c/dsn             (sentry-mw/wrap-sentry c/dsn) ; important that this is first
+    ; important that this is first
+    c/dsn             (sentry-mw/wrap-sentry c/dsn {:environment c/sentry-env
+                                                    :release c/sentry-release})
     c/prod?           wrap-with-logger
     true              wrap-keyword-params
     true              wrap-params
