@@ -76,28 +76,17 @@
   (if c/dsn
     (timbre/merge-config!
       {:level (keyword c/log-level)
-       :appenders {:sentry (sentry/sentry-appender {:dsn c/dsn
-                                                    :environment c/sentry-env
-                                                    :release c/sentry-release})}})
+       :appenders {:sentry (sentry/sentry-appender c/sentry-config)}})
     (timbre/merge-config! {:level (keyword c/log-level)}))
-
-  ;; Uncaught exceptions go to Sentry
-  (Thread/setDefaultUncaughtExceptionHandler
-   (reify Thread$UncaughtExceptionHandler
-     (uncaughtException [_ thread ex]
-       (timbre/error ex "Uncaught exception on" (.getName thread) (.getMessage ex)))))
 
   ;; Start the system
   (-> {:handler-fn app
        :port port
-       :sentry {:dsn c/dsn
-                :environment c/sentry-env
-                :release c/sentry-release}
-       :sqs-consumer
-       {:sqs-queue c/aws-sqs-search-index-queue
-        :message-handler sqs-handler
-        :sqs-creds {:access-key c/aws-access-key-id
-                    :secret-key c/aws-secret-access-key}}}
+       :sentry c/sentry-config
+       :sqs-consumer {:sqs-queue c/aws-sqs-search-index-queue
+                      :message-handler sqs-handler
+                      :sqs-creds {:access-key c/aws-access-key-id
+                                  :secret-key c/aws-secret-access-key}}}
       components/search-system
       component/start)
 
