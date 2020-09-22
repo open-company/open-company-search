@@ -19,8 +19,8 @@
 ;; ----- Sentry -----
 
 (defonce dsn (or (env :open-company-sentry-search) false))
-(defonce sentry-release (or (env :sentry-release) ""))
-(defonce sentry-env (or (env :sentry-env) "local"))
+(defonce sentry-release (or (env :release) ""))
+(defonce sentry-env (or (env :environment) "local"))
 
 ;; ----- AWS -----
 

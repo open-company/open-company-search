@@ -10,17 +10,14 @@
             [cheshire.core :as json]
             [compojure.core :as compojure :refer (GET)]
             [liberator.dev :refer (wrap-trace)]
-            [raven-clj.ring :as sentry-mw]
+            [oc.lib.sentry.core :as sentry]
             [oc.search.config :as c]
-            [oc.lib.sentry-appender :as sentry]
             [oc.lib.sqs :as sqs]
             [oc.search.components :as components]
             [oc.search.core :as ocsearch]
             [oc.search.api :as search-api]))
 
 (defn sqs-handler [msg done-channel]
-  (println "DBG sqs-handler" done-channel)
-  (clojure.pprint/pprint msg)
   (doseq [msg-sqs-body (sqs/read-message-body (:body msg))]
     (let [msg-body (json/parse-string (:Message msg-sqs-body) true)
           msg-type (str (:resource-type msg-body) "-" (if (= (:notification-type msg-body) "delete") "delete" "index"))]
@@ -53,7 +50,11 @@
     "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
     "Hot-reload: " c/hot-reload "\n"
     "Trace: " c/liberator-trace "\n"
-    "Sentry: " c/dsn "\n\n"
+    "Sentry: " c/dsn "\n"
+    "  env: " c/sentry-env "\n"
+    (when-not (clojure.string/blank? c/sentry-release)
+      (str "  release: " c/sentry-release "\n"))
+    "\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn app
@@ -61,8 +62,7 @@
   [sys]
   (cond-> (routes sys)
     ; important that this is first
-    c/dsn             (sentry-mw/wrap-sentry c/dsn {:environment c/sentry-env
-                                                    :release c/sentry-release})
+    c/dsn             (sentry/wrap sys)
     c/prod?           wrap-with-logger
     true              wrap-keyword-params
     true              wrap-params
@@ -76,7 +76,9 @@
   (if c/dsn
     (timbre/merge-config!
       {:level (keyword c/log-level)
-       :appenders {:sentry (sentry/sentry-appender c/dsn)}})
+       :appenders {:sentry (sentry/sentry-appender {:dsn c/dsn
+                                                    :environment c/sentry-env
+                                                    :release c/sentry-release})}})
     (timbre/merge-config! {:level (keyword c/log-level)}))
 
   ;; Uncaught exceptions go to Sentry
@@ -88,6 +90,9 @@
   ;; Start the system
   (-> {:handler-fn app
        :port port
+       :sentry {:dsn c/dsn
+                :environment c/sentry-env
+                :release c/sentry-release}
        :sqs-consumer
        {:sqs-queue c/aws-sqs-search-index-queue
         :message-handler sqs-handler
