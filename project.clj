@@ -31,7 +31,7 @@
     ;; Pull in fasterxml directly to avoid conflicts
     [com.fasterxml.jackson.core/jackson-databind "2.11.2"]
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.29-alpha41"]
+    [open-company/lib "0.17.29-alpha45"]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
