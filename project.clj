@@ -36,11 +36,17 @@
     ;; NB: cheshire is provided by oc.lib
     [clojurewerkz/elastisch "3.0.1" :exclusions [joda-time cheshire clj-http com.google.guava/guava]]
     ;; XML parsers, dependency of ring-json and oc/lib https://github.com/FasterXML/jackson-core
-    ;; NB: not used directly
-    [com.fasterxml.jackson.core/jackson-core "2.10.1"]
-    
+    ;; Pull in fasterxml directly to avoid conflicts
+    [com.fasterxml.jackson.core/jackson-databind "2.11.2"]
+
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.24"]
+    ;; ************************************************************************
+    ;; ****************** NB: don't go under 0.17.29-alpha60 ******************
+    ;; ***************** (JWT schema changes, more info here: *****************
+    ;; ******* https://github.com/open-company/open-company-lib/pull/82) ******
+    ;; ************************************************************************
+    [open-company/lib "0.17.29-alpha63"]
+    ;; ************************************************************************
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; Component - Component Lifecycle https://github.com/stuartsierra/component
     ;; Schema - Data validation https://github.com/Prismatic/schema
@@ -159,7 +165,7 @@
 
   :eastwood {
     ;; Disable some linters that are enabled by default
-    ;; contant-test - just seems mostly ill-advised, logical constants are useful in something like a `->cond` 
+    ;; constant-test - just seems mostly ill-advised, logical constants are useful in something like a `->cond`
     ;; wrong-arity - unfortunate, but it's failing on 3/arity of sqs/send-message
     ;; implicit-dependencies - uhh, just seems dumb
     :exclude-linters [:constant-test :wrong-arity :implicit-dependencies]

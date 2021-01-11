@@ -19,3 +19,10 @@ pom.xml.asc
 .ruby-version
 
 .DS_Store
+
+.idea/
+.vscode/
+.calva/
+.lsp/
+.clj-kondo/
+.clojure-lsp/

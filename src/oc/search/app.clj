@@ -10,9 +10,8 @@
             [cheshire.core :as json]
             [compojure.core :as compojure :refer (GET)]
             [liberator.dev :refer (wrap-trace)]
-            [raven-clj.ring :as sentry-mw]
+            [oc.lib.sentry.core :as sentry]
             [oc.search.config :as c]
-            [oc.lib.sentry-appender :as sentry]
             [oc.lib.sqs :as sqs]
             [oc.search.components :as components]
             [oc.search.core :as ocsearch]
@@ -51,14 +50,19 @@
     "AWS SQS queue: " c/aws-sqs-search-index-queue "\n"
     "Hot-reload: " c/hot-reload "\n"
     "Trace: " c/liberator-trace "\n"
-    "Sentry: " c/dsn "\n\n"
+    "Sentry: " c/dsn "\n"
+    "  env: " c/sentry-env "\n"
+    (when-not (clojure.string/blank? c/sentry-release)
+      (str "  release: " c/sentry-release "\n"))
+    "\n"
     (when c/intro? "Ready to serve...\n"))))
 
 (defn app
   "Ring app definition"
   [sys]
   (cond-> (routes sys)
-    c/dsn             (sentry-mw/wrap-sentry c/dsn) ; important that this is first
+    ; important that this is first
+    c/dsn             (sentry/wrap c/sentry-config)
     c/prod?           wrap-with-logger
     true              wrap-keyword-params
     true              wrap-params
@@ -72,23 +76,17 @@
   (if c/dsn
     (timbre/merge-config!
       {:level (keyword c/log-level)
-       :appenders {:sentry (sentry/sentry-appender c/dsn)}})
+       :appenders {:sentry (sentry/sentry-appender c/sentry-config)}})
     (timbre/merge-config! {:level (keyword c/log-level)}))
-
-  ;; Uncaught exceptions go to Sentry
-  (Thread/setDefaultUncaughtExceptionHandler
-   (reify Thread$UncaughtExceptionHandler
-     (uncaughtException [_ thread ex]
-       (timbre/error ex "Uncaught exception on" (.getName thread) (.getMessage ex)))))
 
   ;; Start the system
   (-> {:handler-fn app
        :port port
-       :sqs-consumer
-       {:sqs-queue c/aws-sqs-search-index-queue
-        :message-handler sqs-handler
-        :sqs-creds {:access-key c/aws-access-key-id
-                    :secret-key c/aws-secret-access-key}}}
+       :sentry c/sentry-config
+       :sqs-consumer {:sqs-queue c/aws-sqs-search-index-queue
+                      :message-handler sqs-handler
+                      :sqs-creds {:access-key c/aws-access-key-id
+                                  :secret-key c/aws-secret-access-key}}}
       components/search-system
       component/start)
 

@@ -7,9 +7,9 @@
 
 ## Background
 
-> There is not a crime, there is not a dodge, there is not a trick, there is not a swindle, there is not a vice which does not live by secrecy.
+> We live in a culture of secrecy, where hiding and lying are accepted as natural, even though we don’t like it. We want honesty, transparency, and authenticity in our loved ones, our groups and organizations, and in our own self so we can reach the heights of our capacity. By clinging to the opaque reality we stall our evolution.
 
-> -- Joseph Pulitzer
+> -- Penney Peirce
 
 Teams struggle to keep everyone on the same page. People are hyper-connected in the moment with chat and email, but it gets noisy as teams grow, and people miss key information. Everyone needs clear and consistent leadership, and the solution is surprisingly simple and effective - **great leadership updates that build transparency and alignment**.
 
@@ -136,6 +136,65 @@ You will also need to subscribe the SQS queue to the storage SNS topic. To do th
 
 Go to the [AWS SQS Console](https://console.aws.amazon.com/sqs/) and select the search queue configured above. From the 'Queue Actions' drop-down, select 'Subscribe Queue to SNS Topic'. Select the SNS topic you've configured your Storage Service instance to publish to, and click the 'Subscribe' button.
 
+
+## Technical Design
+
+```
+┌───────────────┐ ┌─────────────────────┐           
+│               │ │                     │           
+│ OC Web Client │ │   Storage Service   │           
+│               │ │                     │           
+└──────┬────────┘ └┬───────────────┬────┘           
+       │           │               │                
+       │           │              HTTP              
+       │           │               │                
+       │           │             Delete             
+       │         HTTP            events             
+       │           │               │                
+       │        Index              ▼                
+       │       Requests      ┌─────────────────────┐
+       │           │         │SNS Topic            │
+       │           │         │                     │
+      HTTP         │         │      oc-storage     │
+       │           │         │                     │
+     Search        │         └─────────────────────┘
+    requests       │              ▲                 
+       │           │              │                 
+       │           ▼          subscribe             
+       │         ┌────────────────┴────┐            
+       │         │SQS                  │            
+       │         │                     │            
+       │         │   oc-search-index   │            
+       │         │                     │            
+       │         └─────────────────────┘            
+       │                    ▲                       
+       │                    │                       
+       │                  HTTP                      
+       ▼                    │                       
+┌─────────────────────────────────────┐             
+│                                     │             
+│                                     │             
+│                                     │             
+│          Search Service             │             
+│                                     │             
+│                                     │             
+│                                     │             
+└─────────────────────────────────────┘             
+                   │                                
+                   │                                
+                 HTTP                               
+                   │                                
+                   ▼                                
+┌─────────────────────────────────────┐             
+│                                     │             
+│                                     │             
+│            ElasticSearch            │             
+│                                     │             
+│                                     │             
+└─────────────────────────────────────┘                               
+```
+
+
 ## Usage
 
 Prospective users of [Carrot](https://carrot.io/) should get started by going to [Carrot.io](https://carrot.io/). The following usage is **for developers** wanting to work on the OpenCompany Search Service.
@@ -198,7 +257,7 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 Distributed under the [GNU Affero General Public License Version 3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
-Copyright © 2017-2019 OpenCompany, LLC.
+Copyright © 2017-2020 OpenCompany, LLC.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
