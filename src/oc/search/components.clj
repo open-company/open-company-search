@@ -1,6 +1,7 @@
 (ns oc.search.components
   (:require [com.stuartsierra.component :as component]
             [taoensso.timbre :as timbre]
+            [oc.lib.sentry.core :refer (map->SentryCapturer)]
             [org.httpkit.server :as httpkit]
             [oc.lib.sqs :as sqs]
             [oc.search.elastic-search :as es]))
@@ -15,7 +16,7 @@
     (if http-kit
       (do
         (http-kit)
-        (dissoc component :http-kit))
+        (assoc component :http-kit nil))
       component)))
 
 (defrecord Elasticsearch [options handler]
@@ -27,7 +28,7 @@
   (stop [component]
     (timbre/info "[elastic-search] stopping Elasticsearch...")
     (es/stop)
-    (dissoc component :search)))
+    (assoc component :search nil)))
 
 (defrecord Handler [handler-fn]
   component/Lifecycle
@@ -35,12 +36,17 @@
     (timbre/info "[handler] starting")
     (assoc component :handler (handler-fn component)))
   (stop [component]
-    (dissoc component :handler)))
+    (assoc component :handler nil)))
 
-(defn search-system [{:keys [port handler-fn sqs-consumer]}]
+(defn search-system [{:keys [port handler-fn sqs-consumer sentry]}]
   (component/system-map
-   :elastic-search (component/using (map->Elasticsearch {}) [])
-   :sqs-consumer (sqs/sqs-listener sqs-consumer)
+   :sentry-capturer (map->SentryCapturer sentry)
+   :elastic-search (component/using
+                    (map->Elasticsearch {})
+                    [:sentry-capturer])
+   :sqs-consumer (component/using
+                  (sqs/sqs-listener sqs-consumer)
+                  [:sentry-capturer])
    :handler (component/using
              (map->Handler {:handler-fn handler-fn})
              [:elastic-search])
