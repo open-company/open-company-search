@@ -72,12 +72,8 @@
 
 (defn start [port]
 
-  ;; Log errors to Sentry
-  (if c/dsn
-    (timbre/merge-config!
-      {:level (keyword c/log-level)
-       :appenders {:sentry (sentry/sentry-appender c/sentry-config)}})
-    (timbre/merge-config! {:level (keyword c/log-level)}))
+  ;; Set log level
+  (timbre/merge-config! {:level (keyword c/log-level)})
 
   ;; Start the system
   (-> {:handler-fn app
