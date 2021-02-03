@@ -73,7 +73,7 @@
 (defn start [port]
 
   ;; Set log level
-  (timbre/merge-config! {:level (keyword c/log-level)})
+  (timbre/merge-config! {:min-level (keyword c/log-level)})
 
   ;; Start the system
   (-> {:handler-fn app
