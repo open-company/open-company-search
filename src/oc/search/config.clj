@@ -14,15 +14,19 @@
 
 ;; ----- Logging -----
 
-(defonce log-level (or (env :log-level) :info))
+(defonce log-level (if-let [ll (env :log-level)] (keyword ll) :info))
 
 ;; ----- Sentry -----
 
 (defonce dsn (or (env :open-company-sentry-search) false))
 (defonce sentry-release (or (env :release) ""))
+(defonce sentry-deploy (or (env :deploy) ""))
+(defonce sentry-debug  (boolean (or (bool (env :sentry-debug)) (#{:debug :trace} log-level))))
 (defonce sentry-env (or (env :environment) "local"))
 (defonce sentry-config {:dsn dsn
                         :release sentry-release
+                        :deploy sentry-deploy
+                        :debug sentry-debug
                         :environment sentry-env})
 
 ;; ----- AWS -----
