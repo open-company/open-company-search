@@ -9,13 +9,17 @@
 (defrecord HttpKit [options handler]
   component/Lifecycle
   (start [component]
+    (timbre/infof "[http-kit] starting HttpKit with options: %s" options)
     (let [handler (get-in component [:handler :handler] handler)
           server  (httpkit/run-server handler options)]
+      (timbre/infof "[http-kit] started HttpKit")
       (assoc component :http-kit server)))
   (stop [{:keys [http-kit] :as component}]
+    (timbre/infof "[http-kit] stopping HttpKit")
     (if http-kit
       (do
         (http-kit)
+        (timbre/infof "[http-kit] stopped HttpKit")
         (assoc component :http-kit nil))
       component)))
 
@@ -33,7 +37,7 @@
 (defrecord Handler [handler-fn]
   component/Lifecycle
   (start [component]
-    (timbre/info "[handler] starting")
+    (timbre/info "[handler] starting Handler")
     (assoc component :handler (handler-fn component)))
   (stop [component]
     (assoc component :handler nil)))

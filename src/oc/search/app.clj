@@ -6,7 +6,9 @@
             [ring.middleware.params :refer (wrap-params)]
             [ring.middleware.reload :refer (wrap-reload)]
             [ring.middleware.cors :refer (wrap-cors)]
+            [ring.middleware.cookies :refer (wrap-cookies)]
             [ring.logger.timbre :refer (wrap-with-logger)]
+            [oc.lib.api.common :as api-common]
             [cheshire.core :as json]
             [compojure.core :as compojure :refer (GET)]
             [liberator.dev :refer (wrap-trace)]
@@ -59,12 +61,14 @@
   "Ring app definition"
   [sys]
   (cond-> (routes sys)
-    ; important that this is first
+    true              api-common/wrap-500 ; important that this is first
+    ; important that this is second
     c/dsn             (sentry/wrap c/sentry-config)
-    c/prod?           wrap-with-logger
+    true              wrap-with-logger
     true              wrap-keyword-params
     true              wrap-params
     c/liberator-trace (wrap-trace :header :ui)
+    true              wrap-cookies
     true              (wrap-cors #".*")
     c/hot-reload      wrap-reload))
 
